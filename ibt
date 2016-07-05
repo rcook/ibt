@@ -77,7 +77,7 @@ class Context(object):
     if os.path.isfile(file_name):
       return file_name
     parent_dir = os.path.dirname(dir)
-    return None if parent_dir == dir else find_ibt_file(parent_dir)
+    return None if parent_dir == dir else Context._find_ibt_file(parent_dir)
 
 def do_up(ctx, args):
   if len(args) > 0:
