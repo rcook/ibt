@@ -1,4 +1,4 @@
-# ibt
+# ibt: The Isolated Build Tool
 
 ## Standard commands
 
