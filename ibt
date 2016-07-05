@@ -9,6 +9,17 @@ import yaml
 CONTAINER_PROJECT_DIR = "/project"
 CONTAINER_DOT_DIR = os.path.join(CONTAINER_PROJECT_DIR, ".ibt")
 
+def uid_gid(dir):
+  proc = subprocess.Popen(
+    ["stat", "-c", "%u:%g", dir],
+    stdout=subprocess.PIPE,
+    stderr=subprocess.PIPE)
+  (out, error) = proc.communicate()
+  if proc.returncode != 0:
+    raise RuntimeError("stat command failed: {}".format(error))
+
+  return out.strip().split(":")
+
 def docker_image_exists(image_id):
   proc = subprocess.Popen(
     ["docker", "inspect", image_id],
@@ -117,6 +128,7 @@ def do_run(ctx, args):
     raise RuntimeError("Project has not been upped")
 
   rel_dir = os.path.relpath(ctx.dir, ctx.project_dir)
+  (uid, gid) = uid_gid(ctx.project_dir)
 
   local_run_path = os.path.join(ctx.dot_dir, "run.sh")
   container_run_path = os.path.join(CONTAINER_DOT_DIR, "run.sh")
@@ -126,20 +138,11 @@ def do_run(ctx, args):
     f.write("cd {}/{}\n".format(CONTAINER_PROJECT_DIR, rel_dir))
     f.write(" ".join(args) + "\n")
 
-  proc = subprocess.Popen(
-    ["stat", "-c", "%u:%g", ctx.project_dir],
-    stdout=subprocess.PIPE,
-    stderr=subprocess.PIPE)
-  (out, error) = proc.communicate()
-  if proc.returncode != 0:
-    raise RuntimeError("stat command failed: {}".format(error))
-
-  stat_out = out.strip()
   subprocess.check_call([
     "docker",
     "run",
     "-u",
-    stat_out,
+    "{}:{}".format(uid, gid),
     "-v",
     "{}:{}".format(ctx.project_dir, CONTAINER_PROJECT_DIR),
     "--rm",
@@ -156,23 +159,15 @@ def do_shell(ctx, args):
     raise RuntimeError("Project has not been upped")
 
   rel_dir = os.path.relpath(ctx.dir, ctx.project_dir)
+  (uid, gid) = uid_gid(ctx.project_dir)
 
-  proc = subprocess.Popen(
-    ["stat", "-c", "%u:%g", ctx.project_dir],
-    stdout=subprocess.PIPE,
-    stderr=subprocess.PIPE)
-  (out, error) = proc.communicate()
-  if proc.returncode != 0:
-    raise RuntimeError("stat command failed: {}".format(error))
-
-  stat_out = out.strip()
   subprocess.check_call([
     "docker",
     "run",
     "-w",
     os.path.join(CONTAINER_PROJECT_DIR, rel_dir),
     "-u",
-    stat_out,
+    "{}:{}".format(uid, gid),
     "-v",
     "{}:{}".format(ctx.project_dir, CONTAINER_PROJECT_DIR),
     "--rm",
