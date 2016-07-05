@@ -31,6 +31,7 @@ class Context(object):
     self._image_id = "ibt-{}-image".format(self._project_id)
     self._container_id = "ibt-{}-container".format(self._project_id)
     self._project_dir = os.path.dirname(ibt_file_name)
+    self._dot_dir = os.path.join(self._project_dir, ".ibt")
 
   @property
   def project_id(self): return self._project_id
@@ -43,6 +44,9 @@ class Context(object):
 
   @property
   def project_dir(self): return self._project_dir
+
+  @property
+  def dot_dir(self): return self._dot_dir
 
   @staticmethod
   def _find_ibt_file(dir):
@@ -62,9 +66,8 @@ def do_up(ctx, args):
 
   docker_image_build(ctx.image_id, ctx.project_dir)
 
-  dot_dir = os.path.join(ctx.project_dir, ".ibt")
-  if not os.path.isdir(dot_dir):
-    os.makedirs(dot_dir)
+  if not os.path.isdir(ctx.dot_dir):
+    os.makedirs(ctx.dot_dir)
 
 def do_destroy(ctx, args):
   if len(args) > 0:
