@@ -228,7 +228,13 @@ def do_shell(ctx, args):
 def main(dir, args):
   args.pop(0)
   if len(args) < 1:
-    raise RuntimeError("No ibt command specified")
+    print("Commands:\n"
+        "  up         Create Docker image for project\n"
+        "  destroy    Destroy project's Docker image\n"
+        "  run        Run command inside Docker container\n"
+        "  script     Run script inside Docker container\n"
+        "  shell      Run shell inside Docker container\n")
+    return
 
   ctx = Context(dir)
 
