@@ -77,6 +77,7 @@ can be run to configure/make/run the project code:
 ### Example workflow
 
 ```bash
+$ cd example
 $ ibt up
 Building Docker image ibt-789dbc504a0690d786ddd43474dfbcc5
 $ ibt cmake
@@ -109,11 +110,11 @@ $ ibt status
 IBT: The Isolated Build Tool
 
 Project information:
-  Project directory:   /home/user/src/ibt
-  Working directory:   /home/user/src/ibt
+  Project directory:   /home/user/src/ibt/example
+  Working directory:   /home/user/src/ibt/example
   Project ID:          789dbc504a0690d786ddd43474dfbcc5
-  Configuration file:  /home/user/src/ibt/Ibtfile
-  Temporary directory: /home/user/src/ibt/.ibt
+  Configuration file:  /home/user/src/ibt/example/Ibtfile
+  Temporary directory: /home/user/src/ibt/example/.ibt
 User information:
   UID:                 1002
   GID:                 1002
