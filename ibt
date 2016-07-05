@@ -4,6 +4,7 @@ import hashlib
 import os
 import subprocess
 import sys
+import yaml
 
 CONTAINER_PROJECT_DIR = "/project"
 CONTAINER_DOT_DIR = os.path.join(CONTAINER_PROJECT_DIR, ".ibt")
@@ -43,15 +44,18 @@ def docker_image_remove(image_id):
 class Context(object):
   def __init__(self, dir):
     self._dir = dir
-    ibt_file_name = self._find_ibt_file(self._dir)
-    if ibt_file_name is None:
+    self._ibt_file_name = self._find_ibt_file(self._dir)
+    if self._ibt_file_name is None:
       raise RuntimeError("ibt command run outside project")
 
-    self._project_id = hashlib.md5(ibt_file_name).hexdigest()
+    self._project_id = hashlib.md5(self._ibt_file_name).hexdigest()
     self._image_id = "ibt-{}-image".format(self._project_id)
     self._container_id = "ibt-{}-container".format(self._project_id)
-    self._project_dir = os.path.dirname(ibt_file_name)
+    self._project_dir = os.path.dirname(self._ibt_file_name)
     self._dot_dir = os.path.join(self._project_dir, ".ibt")
+
+  @property
+  def ibt_file_name(self): return self._ibt_file_name
 
   @property
   def dir(self): return self._dir
@@ -83,10 +87,19 @@ def do_up(ctx, args):
   if len(args) > 0:
     raise RuntimeError("up takes no arguments")
 
-  docker_image_build(ctx.image_id, ctx.project_dir)
+  with open(ctx.ibt_file_name, "rt") as f:
+    settings = yaml.load(f)
 
   if not os.path.isdir(ctx.dot_dir):
     os.makedirs(ctx.dot_dir)
+
+  with open(os.path.join(ctx.dot_dir, ".dockerignore"), "wt") as f:
+    f.write("*\n")
+
+  with open(os.path.join(ctx.dot_dir, "Dockerfile"), "wt") as f:
+    f.write("FROM {}\n".format(settings["docker-image"]))
+
+  docker_image_build(ctx.image_id, ctx.dot_dir)
 
 def do_destroy(ctx, args):
   if len(args) > 0:
