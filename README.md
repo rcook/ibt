@@ -2,7 +2,7 @@
 
 Simple wrappers around Docker etc. for fully isolated build environments
 
-## What's the point of this?
+## What's the point of this tool?
 
 Docker is great for building isolated environments for builds or applications.
 For my tastes, however, it has a few usability issues associated with it:
@@ -24,6 +24,11 @@ Docker container
 * Source code will typically be under the control of a VCS such as Git
 * Source files should not be copied _en masse_ into the container
 * Output files from builds etc. should be exposed directly to the host
+
+You'll notice that the commands strongly resemble those of [Vagrant][vagrant].
+This is not completely accidental. The workflows described above strongly
+resemble Vagrant workflows where `up`, `destroy`, `run` correspond closely to
+`up`, `destroy` and `ssh`.
 
 ## Standard commands
 
@@ -132,3 +137,5 @@ Destroying Docker image ibt-789dbc504a0690d786ddd43474dfbcc5
 
 Released under MIT License
 Copyright (C) 2016, Richard Cook. All rights reserved.
+
+[vagrant]: https://www.vagrantup.com/
