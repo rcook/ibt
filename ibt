@@ -5,6 +5,10 @@ import os
 import subprocess
 import sys
 
+def run_command(command):
+  print(command)
+  subprocess.check_call(command)
+
 def findIbtFile(dir):
   file_name = os.path.join(dir, "Ibtfile")
   if os.path.isfile(file_name):
@@ -12,7 +16,7 @@ def findIbtFile(dir):
   parent_dir = os.path.dirname(dir)
   return None if parent_dir == dir else findIbtFile(parent_dir)
 
-def doUp(dir, args):
+def do_up(dir, args):
   if len(args) > 0:
     raise RuntimeError("up takes no arguments")
 
@@ -26,15 +30,15 @@ def doUp(dir, args):
   project_dir = os.path.dirname(ibt_file_name)
 
   # Ensure image exists
-  subprocess.check_call([
-    'docker',
-    'build',
-    '-t',
+  run_command([
+    "docker",
+    "build",
+    "-t",
     image_id,
     project_dir
   ])
 
-def doDestroy(dir, args):
+def do_destroy(dir, args):
   if len(args) > 0:
     raise RuntimeError("destroy takes no arguments")
 
@@ -48,13 +52,13 @@ def doDestroy(dir, args):
   project_dir = os.path.dirname(ibt_file_name)
 
   # Ensure image exists
-  subprocess.check_call([
-    'docker',
-    'rmi',
+  run_command([
+    "docker",
+    "rmi",
     image_id
   ])
 
-def doRun(dir, args):
+def do_run(dir, args):
   if len(args) == 0:
     raise RuntimeError("run takes one or more arguments")
 
@@ -68,10 +72,12 @@ def doRun(dir, args):
   project_dir = os.path.dirname(ibt_file_name)
 
   # Ensure image exists
-  subprocess.check_call([
-    'docker',
-    'run',
-    '--rm',
+  run_command([
+    "docker",
+    "run",
+    "-v",
+    "{}:{}".format(project_dir, "/project"),
+    "--rm",
     image_id
   ] + args)
   #subprocess.check_call(args)
@@ -83,11 +89,11 @@ def main(dir, args):
 
   command = args.pop(0)
   if command == "up":
-    doUp(dir, args)
+    do_up(dir, args)
   elif command == "destroy":
-    doDestroy(dir, args)
+    do_destroy(dir, args)
   elif command == "run":
-    doRun(dir, args)
+    do_run(dir, args)
   else:
     raise RuntimeError("Unsupported command {}".format(command))
 
