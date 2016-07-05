@@ -20,11 +20,23 @@ configure port forwarding
 
 ## Sample project
 
+All build commands will run inside a fully isolated Debian-based Docker
+container as specified by the project configuration in `Ibtfile`. First, create
+the base Docker image:
+
+```bash
+$ cd docker-images/debian-gcc
+$ make build
+$ cd ../debian-gcc-python
+$ make build
+```
+
+Once this is done, the following commands (configured as aliases in `Ibtfile`)
+can be run to configure/make/run the project code:
+
 * `ibt cmake`: generates CMake build directory
 * `ibt make`: runs make inside CMake build directory
 * `ibt exec`: runs generated binary
-
-All commands run inside a fully isolated Debian-based Docker container.
 
 ## Licence
 
