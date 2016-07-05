@@ -39,7 +39,8 @@ can be run to configure/make/run the project code:
 
 * `ibt cmake`: generates CMake build directory
 * `ibt make`: runs `make` inside CMake build directory
-* `ibt exec`: runs generated binary
+* `ibt exec`: runs target binary
+* `ibt debug`: starts gdb and loads target binary
 
 ## Licence
 
