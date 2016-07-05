@@ -87,17 +87,12 @@ def make_run_command(ctx, container_working_dir, args=None):
     "{}:{}".format(ctx.project_dir, CONTAINER_PROJECT_DIR),
     "--rm"
   ] + ports
-  back = [
-    ctx.image_id
-  ]
+  back = [ctx.image_id]
 
   return front + back if args is None else front + args + back
 
 def docker_run(ctx, container_working_dir, container_run_path):
-  command = make_run_command(ctx, container_working_dir) + [
-    "/bin/sh",
-    container_run_path
-  ]
+  command = make_run_command(ctx, container_working_dir) + ["/bin/sh", container_run_path]
   subprocess.check_call(command)
     
 class Context(object):
@@ -183,10 +178,7 @@ def do_run(ctx, args):
     f.write("#!/bin/sh\n")
     f.write(" ".join(args) + "\n")
 
-  docker_run(
-    ctx,
-    container_working_dir,
-    container_run_path)
+  docker_run(ctx, container_working_dir, container_run_path)
 
 def do_script(ctx, args):
   if len(args) != 1:
@@ -209,10 +201,7 @@ def do_script(ctx, args):
     f.write("chmod +x {}\n".format(container_script_path))
     f.write(container_script_path + "\n")
 
-  docker_run(
-    ctx,
-    container_working_dir,
-    container_run_path)
+  docker_run(ctx, container_working_dir, container_run_path)
 
 def do_shell(ctx, args):
   if len(args) != 0:
@@ -224,10 +213,7 @@ def do_shell(ctx, args):
   rel_dir = os.path.relpath(ctx.dir, ctx.project_dir)
   container_working_dir = os.path.join(CONTAINER_PROJECT_DIR, rel_dir)
 
-  command = make_run_command(
-    ctx,
-    container_working_dir,
-    ["-it"])
+  command = make_run_command(ctx, container_working_dir, ["-it"])
   subprocess.check_call(command)
 
 def do_status(ctx, args):
