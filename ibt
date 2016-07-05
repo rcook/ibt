@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import hashlib
 import os
 import subprocess
 import sys
@@ -15,6 +16,44 @@ def doUp(dir, args):
   if len(args) > 0:
     raise RuntimeError("up takes no arguments")
 
+  ibt_file_name = findIbtFile(dir)
+  if ibt_file_name is None:
+    raise RuntimeError("ibt command run outside project")
+
+  project_id = hashlib.md5(ibt_file_name).hexdigest()
+  image_id = "ibt-{}-image".format(project_id)
+  container_id = "ibt-{}-container".format(project_id)
+  project_dir = os.path.dirname(ibt_file_name)
+
+  # Ensure image exists
+  subprocess.check_call([
+    'docker',
+    'build',
+    '-t',
+    image_id,
+    project_dir
+  ])
+
+def doDestroy(dir, args):
+  if len(args) > 0:
+    raise RuntimeError("destroy takes no arguments")
+
+  ibt_file_name = findIbtFile(dir)
+  if ibt_file_name is None:
+    raise RuntimeError("ibt command run outside project")
+
+  project_id = hashlib.md5(ibt_file_name).hexdigest()
+  image_id = "ibt-{}-image".format(project_id)
+  container_id = "ibt-{}-container".format(project_id)
+  project_dir = os.path.dirname(ibt_file_name)
+
+  # Ensure image exists
+  subprocess.check_call([
+    'docker',
+    'rmi',
+    image_id
+  ])
+
 def doRun(dir, args):
   if len(args) == 0:
     raise RuntimeError("run takes one or more arguments")
@@ -23,7 +62,19 @@ def doRun(dir, args):
   if ibt_file_name is None:
     raise RuntimeError("ibt command run outside project")
 
-  subprocess.check_call(args)
+  project_id = hashlib.md5(ibt_file_name).hexdigest()
+  image_id = "ibt-{}-image".format(project_id)
+  container_id = "ibt-{}-container".format(project_id)
+  project_dir = os.path.dirname(ibt_file_name)
+
+  # Ensure image exists
+  subprocess.check_call([
+    'docker',
+    'run',
+    '--rm',
+    image_id
+  ] + args)
+  #subprocess.check_call(args)
     
 def main(dir, args):
   args.pop(0)
@@ -33,6 +84,8 @@ def main(dir, args):
   command = args.pop(0)
   if command == "up":
     doUp(dir, args)
+  elif command == "destroy":
+    doDestroy(dir, args)
   elif command == "run":
     doRun(dir, args)
   else:
