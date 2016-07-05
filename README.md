@@ -24,6 +24,8 @@ configure port forwarding
 * `ibt make`: runs make inside CMake build directory
 * `ibt exec`: runs generated binary
 
+All commands run inside a fully isolated Debian-based Docker container.
+
 ## Licence
 
 Released under MIT License
