@@ -18,6 +18,7 @@ import yaml
 
 CONTAINER_PROJECT_DIR = "/ibt"
 CONTAINER_DOT_DIR = os.path.join(CONTAINER_PROJECT_DIR, ".ibt")
+SCRIPT_FILE_NAME = "temp.sh"
 
 def uid_gid(dir):
   proc = subprocess.Popen(
@@ -64,7 +65,7 @@ def docker_image_remove(image_id):
   else:
     print("No Docker image {} to destroy".format(image_id))
 
-def make_run_command(project_dir, image_id, container_working_dir, args):
+def make_run_command(image_id, project_dir, container_working_dir, args=None):
   (uid, gid) = uid_gid(project_dir)
   front = [
     "docker",
@@ -80,22 +81,15 @@ def make_run_command(project_dir, image_id, container_working_dir, args):
   back = [
     image_id
   ]
-  return front + args + back
 
-def docker_run(image_id, project_dir, container_run_path):
-  (uid, gid) = uid_gid(project_dir)
-  subprocess.check_call([
-    "docker",
-    "run",
-    "-u",
-    "{}:{}".format(uid, gid),
-    "-v",
-    "{}:{}".format(project_dir, CONTAINER_PROJECT_DIR),
-    "--rm",
-    image_id,
+  return front + back if args is None else front + args + back
+
+def docker_run(image_id, project_dir, container_working_dir, container_run_path):
+  command = make_run_command(image_id, project_dir, container_working_dir) + [
     "/bin/sh",
     container_run_path
-  ])
+  ]
+  subprocess.check_call(command)
     
 class Context(object):
   def __init__(self, dir):
@@ -175,16 +169,20 @@ def do_run(ctx, args):
     raise RuntimeError("Project has not been upped")
 
   rel_dir = os.path.relpath(ctx.dir, ctx.project_dir)
+  container_working_dir = os.path.join(CONTAINER_PROJECT_DIR, rel_dir)
 
-  local_run_path = os.path.join(ctx.dot_dir, "run.sh")
-  container_run_path = os.path.join(CONTAINER_DOT_DIR, "run.sh")
+  local_run_path = os.path.join(ctx.dot_dir, SCRIPT_FILE_NAME)
+  container_run_path = os.path.join(CONTAINER_DOT_DIR, SCRIPT_FILE_NAME)
 
   with open(local_run_path, "wt") as f:
     f.write("#!/bin/sh\n")
-    f.write("cd {}/{}\n".format(CONTAINER_PROJECT_DIR, rel_dir))
     f.write(" ".join(args) + "\n")
 
-  docker_run(ctx.image_id, ctx.project_dir, container_run_path)
+  docker_run(
+    ctx.image_id,
+    ctx.project_dir,
+    container_working_dir,
+    container_run_path)
 
 def do_script(ctx, args):
   if len(args) != 1:
@@ -194,21 +192,24 @@ def do_script(ctx, args):
     raise RuntimeError("Project has not been upped")
 
   rel_dir = os.path.relpath(ctx.dir, ctx.project_dir)
+  container_working_dir = os.path.join(CONTAINER_PROJECT_DIR, rel_dir)
 
-  local_run_path = os.path.join(ctx.dot_dir, "run.sh")
-  container_run_path = os.path.join(CONTAINER_DOT_DIR, "run.sh")
+  local_run_path = os.path.join(ctx.dot_dir, SCRIPT_FILE_NAME)
+  container_run_path = os.path.join(CONTAINER_DOT_DIR, SCRIPT_FILE_NAME)
 
   shutil.copyfile(args[0], os.path.join(ctx.dot_dir, "script"))
-
   container_script_path = os.path.join(CONTAINER_DOT_DIR, "script")
 
   with open(local_run_path, "wt") as f:
     f.write("#!/bin/sh\n")
-    f.write("cd {}/{}\n".format(CONTAINER_PROJECT_DIR, rel_dir))
     f.write("chmod +x {}\n".format(container_script_path))
     f.write(container_script_path + "\n")
 
-  docker_run(ctx.image_id, ctx.project_dir, container_run_path)
+  docker_run(
+    ctx.image_id,
+    ctx.project_dir,
+    container_working_dir,
+    container_run_path)
 
 def do_shell(ctx, args):
   if len(args) != 0:
@@ -218,12 +219,12 @@ def do_shell(ctx, args):
     raise RuntimeError("Project has not been upped")
 
   rel_dir = os.path.relpath(ctx.dir, ctx.project_dir)
-  (uid, gid) = uid_gid(ctx.project_dir)
+  container_working_dir = os.path.join(CONTAINER_PROJECT_DIR, rel_dir)
 
   command = make_run_command(
-    ctx.project_dir,
     ctx.image_id,
-    os.path.join(CONTAINER_PROJECT_DIR, rel_dir),
+    ctx.project_dir,
+    container_working_dir,
     ["-it"])
   subprocess.check_call(command)
 
