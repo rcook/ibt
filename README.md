@@ -23,3 +23,8 @@ configure port forwarding
 * `ibt cmake`: generates CMake build directory
 * `ibt make`: runs make inside CMake build directory
 * `ibt exec`: runs generated binary
+
+## Licence
+
+Released under MIT License
+Copyright (C) 2016, Richard Cook. All rights reserved.
