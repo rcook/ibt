@@ -148,6 +148,38 @@ def do_run(ctx, args):
     container_run_path
   ])
     
+def do_shell(ctx, args):
+  if len(args) != 0:
+    raise RuntimeError("shell takes no arguments")
+
+  if not docker_image_exists(ctx.image_id):
+    raise RuntimeError("Project has not been upped")
+
+  rel_dir = os.path.relpath(ctx.dir, ctx.project_dir)
+
+  proc = subprocess.Popen(
+    ["stat", "-c", "%u:%g", ctx.project_dir],
+    stdout=subprocess.PIPE,
+    stderr=subprocess.PIPE)
+  (out, error) = proc.communicate()
+  if proc.returncode != 0:
+    raise RuntimeError("stat command failed: {}".format(error))
+
+  stat_out = out.strip()
+  subprocess.check_call([
+    "docker",
+    "run",
+    "-w",
+    os.path.join(CONTAINER_PROJECT_DIR, rel_dir),
+    "-u",
+    stat_out,
+    "-v",
+    "{}:{}".format(ctx.project_dir, CONTAINER_PROJECT_DIR),
+    "--rm",
+    "-it",
+    ctx.image_id
+  ])
+
 def main(dir, args):
   args.pop(0)
   if len(args) < 1:
@@ -162,6 +194,8 @@ def main(dir, args):
     do_destroy(ctx, args)
   elif command == "run":
     do_run(ctx, args)
+  elif command == "shell":
+    do_shell(ctx, args)
   else:
     raise RuntimeError("Unsupported command {}".format(command))
 
