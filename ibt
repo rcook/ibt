@@ -5,7 +5,7 @@
 # IBT: The Isolated Build Tool
 # Copyright (C) 2016, Richard Cook. All rights reserved.
 #
-# Simple wrappers around Docker etc. for fully isolating build environments
+# Simple wrappers around Docker etc. for fully isolated build environments
 #
 ###############################################################################
 
@@ -83,6 +83,10 @@ def make_run_command(image_id, project_dir, container_working_dir, args=None):
   ]
 
   return front + back if args is None else front + args + back
+
+  if args is None:
+    re
+  return front + args + back
 
 def docker_run(image_id, project_dir, container_working_dir, container_run_path):
   command = make_run_command(image_id, project_dir, container_working_dir) + [
