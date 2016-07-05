@@ -225,6 +225,7 @@ def do_status(ctx, args):
 
   (uid, gid) = uid_gid(ctx.project_dir)
 
+  print("ibt: The Isolated Build Tool\n")
   print("Project information:")
   print("  Project directory:   {}".format(ctx.project_dir))
   print("  Working directory:   {}".format(ctx.dir))
@@ -239,6 +240,15 @@ def do_status(ctx, args):
   print("IBT status:")
   print("  Temporary directory: {}".format("exists" if os.path.isdir(ctx.dot_dir) else "does not exist"))
   print("  Docker image:        {}".format("built" if docker_image_exists(ctx.image_id) else "not built"))
+
+  settings = read_settings(ctx)
+  aliases = settings.get("aliases", [])
+  if len(aliases) > 0:
+    print("\nProject aliases:")
+    for key in sorted(aliases):
+      print("  {} = {}".format(key, aliases[key]))
+
+  print("")
 
 def run_command(ctx, args):
   command = args.pop(0)
