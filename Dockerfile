@@ -1,1 +1,1 @@
-FROM ibt/debian-with-cmake
+FROM ibt/debian-gcc
