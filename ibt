@@ -65,8 +65,17 @@ def docker_image_remove(image_id):
   else:
     print("No Docker image {} to destroy".format(image_id))
 
-def make_run_command(image_id, project_dir, container_working_dir, args=None):
-  (uid, gid) = uid_gid(project_dir)
+def make_run_command(ctx, container_working_dir, args=None):
+  with open(ctx.ibt_file_name, "rt") as f:
+    settings = yaml.load(f)
+
+  ports = []
+  if "forwarded-ports" in settings:
+    for entry in settings["forwarded-ports"]:
+      ports.append("-p")
+      ports.append(entry)
+
+  (uid, gid) = uid_gid(ctx.project_dir)
   front = [
     "docker",
     "run",
@@ -75,21 +84,17 @@ def make_run_command(image_id, project_dir, container_working_dir, args=None):
     "-u",
     "{}:{}".format(uid, gid),
     "-v",
-    "{}:{}".format(project_dir, CONTAINER_PROJECT_DIR),
-    "--rm",
-  ]
+    "{}:{}".format(ctx.project_dir, CONTAINER_PROJECT_DIR),
+    "--rm"
+  ] + ports
   back = [
-    image_id
+    ctx.image_id
   ]
 
   return front + back if args is None else front + args + back
 
-  if args is None:
-    re
-  return front + args + back
-
-def docker_run(image_id, project_dir, container_working_dir, container_run_path):
-  command = make_run_command(image_id, project_dir, container_working_dir) + [
+def docker_run(ctx, container_working_dir, container_run_path):
+  command = make_run_command(ctx, container_working_dir) + [
     "/bin/sh",
     container_run_path
   ]
@@ -179,8 +184,7 @@ def do_run(ctx, args):
     f.write(" ".join(args) + "\n")
 
   docker_run(
-    ctx.image_id,
-    ctx.project_dir,
+    ctx,
     container_working_dir,
     container_run_path)
 
@@ -206,8 +210,7 @@ def do_script(ctx, args):
     f.write(container_script_path + "\n")
 
   docker_run(
-    ctx.image_id,
-    ctx.project_dir,
+    ctx,
     container_working_dir,
     container_run_path)
 
@@ -222,8 +225,7 @@ def do_shell(ctx, args):
   container_working_dir = os.path.join(CONTAINER_PROJECT_DIR, rel_dir)
 
   command = make_run_command(
-    ctx.image_id,
-    ctx.project_dir,
+    ctx,
     container_working_dir,
     ["-it"])
   subprocess.check_call(command)
