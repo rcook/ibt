@@ -17,3 +17,9 @@ Simple wrappers around Docker etc. for fully isolated build environments
 * `forwarded-ports`: (optional) one or more host:container port pairs to
 configure port forwarding
 * `aliases`: (optional) one or more project-specific command aliases
+
+## Sample project
+
+* `ibt cmake`: generates CMake build directory
+* `ibt make`: runs make inside CMake build directory
+* `ibt exec`: runs generated binary
