@@ -1,1 +1,1 @@
-docker-image: ibt/debian-gcc
+docker-image: ibt/debian-gcc-python
