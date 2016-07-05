@@ -2,6 +2,29 @@
 
 Simple wrappers around Docker etc. for fully isolated build environments
 
+## What's the point of this?
+
+Docker is great for building isolated environments for builds or applications.
+For my tastes, however, it has a few usability issues associated with it:
+
+* The commands are fiddly to use and difficult to remember
+* Docker containers run as root by default resulting in files created on the
+host as the root user, instead of the current user
+* It's too easy to leave intermediate images and containers lying around
+
+Note that this is a very personal list of perceived shortcomings. If these
+aren't issues for you, then don't use this tool!
+
+ibt makes Docker images and containers more development- and project-focused.
+It encourages the following workflows:
+
+* Editing of source files is carried out predominantly on the _host_ machine
+* Building, running and debugging of targets is always carried out within the
+Docker container
+* Source code will typically be under the control of a VCS such as Git
+* Source files should not be copied _en masse_ into the container
+* Output files from builds etc. should be exposed directly to the host
+
 ## Standard commands
 
 * `up`: creates Docker image for the project
