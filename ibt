@@ -290,7 +290,7 @@ def main(dir, args):
 
   command = args[0]
   if command in aliases:
-    run_command(ctx, shlex.split(aliases[command]))
+    run_command(ctx, shlex.split(aliases[command]) + args[1:])
   else:
     run_command(ctx, args)
 
