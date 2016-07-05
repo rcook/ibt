@@ -274,7 +274,7 @@ def main(dir, args):
 
     if len(aliases) > 0:
       print("\nProject aliases:\n")
-      for key in aliases:
+      for key in sorted(aliases):
         print("  {} = {}".format(key, aliases[key]))
 
     return
