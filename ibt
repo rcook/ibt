@@ -103,8 +103,7 @@ class Context(object):
       raise RuntimeError("ibt command run outside project")
 
     self._project_id = hashlib.md5(self._ibt_file_name).hexdigest()
-    self._image_id = "ibt-{}-image".format(self._project_id)
-    self._container_id = "ibt-{}-container".format(self._project_id)
+    self._image_id = "ibt-{}".format(self._project_id)
     self._project_dir = os.path.dirname(self._ibt_file_name)
     self._dot_dir = os.path.join(self._project_dir, ".ibt")
 
@@ -119,9 +118,6 @@ class Context(object):
 
   @property
   def image_id(self): return self._image_id
-
-  @property
-  def container_id(self): return self._container_id
 
   @property
   def project_dir(self): return self._project_dir
@@ -249,7 +245,6 @@ def do_status(ctx, args):
   print("  GID:                 {}".format(gid))
   print("Docker information:")
   print("  Docker image ID:     {}".format(ctx.image_id))
-  print("  Docker container ID: {}".format(ctx.container_id))
   print("IBT status:")
   print("  Temporary directory: {}".format("exists" if os.path.isdir(ctx.dot_dir) else "does not exist"))
   print("  Docker image:        {}".format("built" if docker_image_exists(ctx.image_id) else "not built"))
