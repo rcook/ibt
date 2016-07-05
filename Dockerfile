@@ -1,4 +1,1 @@
-FROM debian
-
-RUN apt-get update -y && apt-get install -y \
-  cmake
+FROM ibt/debian-with-cmake
