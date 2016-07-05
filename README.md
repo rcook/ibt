@@ -1,6 +1,6 @@
 # ibt: The Isolated Build Tool
 
-Simple wrappers around Docker etc. for fully isolated build environments
+Simple wrappers around [Docker][docker] for fully isolated build environments
 
 ## What's the point of this tool?
 
@@ -138,4 +138,5 @@ Destroying Docker image ibt-789dbc504a0690d786ddd43474dfbcc5
 Released under MIT License
 Copyright (C) 2016, Richard Cook. All rights reserved.
 
+[docker]: https://www.docker.com/
 [vagrant]: https://www.vagrantup.com/
