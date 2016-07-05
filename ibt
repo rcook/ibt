@@ -98,11 +98,13 @@ def do_run(ctx, args):
   if len(args) == 0:
     raise RuntimeError("run takes one or more arguments")
 
+  if not docker_image_exists(ctx.image_id):
+    raise RuntimeError("Project has not been upped")
+
   rel_dir = os.path.relpath(ctx.dir, ctx.project_dir)
 
   local_run_path = os.path.join(ctx.dot_dir, "run.sh")
   container_run_path = os.path.join(CONTAINER_DOT_DIR, "run.sh")
-
 
   with open(local_run_path, "wt") as f:
     f.write("#!/bin/sh\n")
@@ -123,7 +125,7 @@ def do_run(ctx, args):
 def main(dir, args):
   args.pop(0)
   if len(args) < 1:
-    raise RuntimeError("no ibt command specified")
+    raise RuntimeError("No ibt command specified")
 
   ctx = Context(dir)
 
