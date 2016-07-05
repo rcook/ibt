@@ -46,6 +46,65 @@ can be run to configure/make/run the project code:
 * `ibt exec`: runs target binary
 * `ibt debug`: starts gdb and loads target binary
 
+### Example workflow
+
+```bash
+$ ibt up
+Building Docker image ibt-789dbc504a0690d786ddd43474dfbcc5
+$ ibt cmake
+-- The C compiler identification is GNU 4.9.2
+-- The CXX compiler identification is GNU 4.9.2
+-- Check for working C compiler: /usr/bin/cc
+-- Check for working C compiler: /usr/bin/cc -- works
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++
+-- Check for working CXX compiler: /usr/bin/c++ -- works
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /ibt/build
+$ ibt make
+Scanning dependencies of target hello-world
+[100%] Building CXX object CMakeFiles/hello-world.dir/hello-world.cpp.o
+Linking CXX executable hello-world
+[100%] Built target hello-world
+$ ibt exec first second third
+Hello world
+argc=4
+argv[0] = ./hello-world
+argv[1] = first
+argv[2] = second
+argv[3] = third
+$ ibt status
+ibt: The Isolated Build Tool
+
+Project information:
+  Project directory:   /home/user/src/ibt
+  Working directory:   /home/user/src/ibt
+  Project ID:          789dbc504a0690d786ddd43474dfbcc5
+  Configuration file:  /home/user/src/ibt/Ibtfile
+  Temporary directory: /home/user/src/ibt/.ibt
+User information:
+  UID:                 1002
+  GID:                 1002
+Docker information:
+  Docker image ID:     ibt-789dbc504a0690d786ddd43474dfbcc5
+IBT status:
+  Temporary directory: exists
+  Docker image:        built
+
+Project aliases:
+  cmake = run 'cd /ibt && if [ ! -d build ]; then mkdir build; fi && cd build && cmake -DCMAKE_BUILD_TYPE=Debug ..'
+  debug = shell /bin/sh -c 'cd /ibt/build && gdb ./hello-world'
+  exec = run 'cd /ibt/build && ./hello-world'
+  make = run 'cd /ibt/build && make'
+
+$ ibt destroy
+Destroying Docker image ibt-789dbc504a0690d786ddd43474dfbcc5
+```
+
 ## Licence
 
 Released under MIT License
