@@ -109,8 +109,12 @@ def do_up(ctx, args):
   with open(os.path.join(ctx.dot_dir, ".dockerignore"), "wt") as f:
     f.write("*\n")
 
+  (uid, gid) = uid_gid(ctx.project_dir)
+
   with open(os.path.join(ctx.dot_dir, "Dockerfile"), "wt") as f:
     f.write("FROM {}\n".format(settings["docker-image"]))
+    f.write("RUN groupadd -g {} ibt\n".format(gid))
+    f.write("RUN useradd -u {} -g {} ibt\n".format(uid, gid))
 
   docker_image_build(ctx.image_id, ctx.dot_dir)
 
