@@ -232,6 +232,25 @@ def do_shell(ctx, args):
     ["-it"])
   subprocess.check_call(command)
 
+def do_status(ctx, args):
+  if len(args) > 0:
+    raise RuntimeError("status takes no arguments")
+
+  (uid, gid) = uid_gid(ctx.project_dir)
+
+  print("Project information:")
+  print("  ibt file name:       {}".format(ctx.ibt_file_name))
+  print("  Project directory:   {}".format(ctx.project_dir))
+  print("  Current directory:   {}".format(ctx.dir))
+  print("  ibt directory:       {}".format(ctx.dot_dir))
+  print("  Project ID:          {}".format(ctx.project_id))
+  print("User information:")
+  print("  UID:                 {}".format(uid))
+  print("  GID:                 {}".format(gid))
+  print("Docker information:")
+  print("  Docker image ID:     {}".format(ctx.image_id))
+  print("  Docker container ID: {}".format(ctx.container_id))
+
 def main(dir, args):
   args.pop(0)
   if len(args) < 1:
@@ -240,7 +259,8 @@ def main(dir, args):
         "  destroy    Destroy project's Docker image\n"
         "  run        Run command inside Docker container\n"
         "  script     Run script inside Docker container\n"
-        "  shell      Run shell inside Docker container\n")
+        "  shell      Run shell inside Docker container\n"
+        "  status     Show project status\n")
     return
 
   ctx = Context(dir)
@@ -256,6 +276,8 @@ def main(dir, args):
     do_script(ctx, args)
   elif command == "shell":
     do_shell(ctx, args)
+  elif command == "status":
+    do_status(ctx, args)
   else:
     raise RuntimeError("Unsupported command {}".format(command))
 
