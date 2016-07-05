@@ -20,6 +20,8 @@ configure port forwarding
 
 ## Sample project
 
+### Create Docker images
+
 All build commands will run inside a fully isolated Debian-based Docker
 container as specified by the project configuration in `Ibtfile`. First, create
 the base Docker images:
@@ -33,6 +35,8 @@ $ make build
 
 This creates `debian-gcc` which contains basic build tools, CMake and gdb and
 `debian-gcc-python` which extends this with the addition of Python 2.7.
+
+### Aliases
 
 Once this is done, the following commands (configured as aliases in `Ibtfile`)
 can be run to configure/make/run the project code:
