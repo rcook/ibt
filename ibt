@@ -5,6 +5,9 @@ import os
 import subprocess
 import sys
 
+CONTAINER_PROJECT_DIR = "/project"
+CONTAINER_DOT_DIR = os.path.join(CONTAINER_PROJECT_DIR, ".ibt")
+
 def docker_image_exists(image_id):
   proc = subprocess.Popen(
     ["docker", "inspect", image_id],
@@ -23,7 +26,8 @@ def docker_image_remove(image_id):
 
 class Context(object):
   def __init__(self, dir):
-    ibt_file_name = self._find_ibt_file(dir)
+    self._dir = dir
+    ibt_file_name = self._find_ibt_file(self._dir)
     if ibt_file_name is None:
       raise RuntimeError("ibt command run outside project")
 
@@ -32,6 +36,9 @@ class Context(object):
     self._container_id = "ibt-{}-container".format(self._project_id)
     self._project_dir = os.path.dirname(ibt_file_name)
     self._dot_dir = os.path.join(self._project_dir, ".ibt")
+
+  @property
+  def dir(self): return self._dir
 
   @property
   def project_id(self): return self._project_id
@@ -56,10 +63,6 @@ class Context(object):
     parent_dir = os.path.dirname(dir)
     return None if parent_dir == dir else find_ibt_file(parent_dir)
 
-def run_command(command):
-  print(command)
-  subprocess.check_call(command)
-
 def do_up(ctx, args):
   if len(args) > 0:
     raise RuntimeError("up takes no arguments")
@@ -75,36 +78,30 @@ def do_destroy(ctx, args):
 
   docker_image_remove(ctx.image_id)
 
-def do_run(dir, args):
+def do_run(ctx, args):
   if len(args) == 0:
     raise RuntimeError("run takes one or more arguments")
 
-  ibt_file_name = find_ibt_file(dir)
-  if ibt_file_name is None:
-    raise RuntimeError("ibt command run outside project")
+  rel_dir = os.path.relpath(ctx.dir, ctx.project_dir)
 
-  project_id = hashlib.md5(ibt_file_name).hexdigest()
-  image_id = "ibt-{}-image".format(project_id)
-  container_id = "ibt-{}-container".format(project_id)
-  project_dir = os.path.dirname(ibt_file_name)
+  local_run_path = os.path.join(ctx.dot_dir, "run.sh")
+  container_run_path = os.path.join(CONTAINER_DOT_DIR, "run.sh")
 
-  rel_dir = os.path.relpath(dir, project_dir)
-  with open(os.path.join(project_dir, ".ibt/docker-script.sh"), "wt") as f:
+
+  with open(local_run_path, "wt") as f:
     f.write("#!/bin/sh\n")
-    f.write("cd /project\n")
-    f.write("cd {}\n".format(rel_dir))
+    f.write("cd {}/{}\n".format(CONTAINER_PROJECT_DIR, rel_dir))
     f.write(" ".join(args) + "\n")
 
-  # Execute script inside container
-  run_command([
+  subprocess.check_call([
     "docker",
     "run",
     "-v",
-    "{}:{}".format(project_dir, "/project"),
+    "{}:{}".format(ctx.project_dir, CONTAINER_PROJECT_DIR),
     "--rm",
-    image_id,
+    ctx.image_id,
     "/bin/sh",
-    "/project/.ibt/docker-script.sh"
+    container_run_path
   ])
     
 def main(dir, args):
@@ -120,7 +117,7 @@ def main(dir, args):
   elif command == "destroy":
     do_destroy(ctx, args)
   elif command == "run":
-    do_run(dir, args)
+    do_run(ctx, args)
   else:
     raise RuntimeError("Unsupported command {}".format(command))
 
