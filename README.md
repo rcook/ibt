@@ -1,5 +1,7 @@
 # ibt: The Isolated Build Tool
 
+Simple wrappers around Docker etc. for fully isolated build environments
+
 ## Standard commands
 
 * `up`: creates Docker image for the project
