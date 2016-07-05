@@ -260,7 +260,7 @@ def run_command(ctx, args):
 def main(dir, args):
   ctx = Context(dir)
   settings = read_settings(ctx)
-  aliases = settings["aliases"]
+  aliases = settings.get("aliases", [])
 
   args.pop(0)
   if len(args) < 1:
@@ -271,13 +271,14 @@ def main(dir, args):
         "  run        Run command inside Docker container\n"
         "  script     Run script inside Docker container\n"
         "  shell      Run shell inside Docker container\n"
-        "  status     Show project status\n")
+        "  status     Show project status")
 
     if len(aliases) > 0:
-      print("Project aliases:")
+      print("\nProject aliases:")
       for key in sorted(aliases):
         print("  {} = {}".format(key, aliases[key]))
 
+    print("")
     return
 
   command = args[0]
