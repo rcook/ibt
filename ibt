@@ -71,16 +71,24 @@ def do_run(dir, args):
   container_id = "ibt-{}-container".format(project_id)
   project_dir = os.path.dirname(ibt_file_name)
 
-  # Ensure image exists
+  rel_dir = os.path.relpath(dir, project_dir)
+  with open(os.path.join(project_dir, ".ibt/docker-script.sh"), "wt") as f:
+    f.write("#!/bin/sh\n")
+    f.write("cd /project\n")
+    f.write("cd {}\n".format(rel_dir))
+    f.write(" ".join(args) + "\n")
+
+  # Execute script inside container
   run_command([
     "docker",
     "run",
     "-v",
     "{}:{}".format(project_dir, "/project"),
     "--rm",
-    image_id
-  ] + args)
-  #subprocess.check_call(args)
+    image_id,
+    "/bin/sh",
+    "/project/.ibt/docker-script.sh"
+  ])
     
 def main(dir, args):
   args.pop(0)
