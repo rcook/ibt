@@ -1,6 +1,7 @@
 # IBT: The Isolated Build Tool
 
-Simple wrappers around [Docker][docker] for fully isolated build environments
+Simple Python wrapper script around [Docker][docker] for fully isolated build
+environments
 
 ## What's the point of this tool?
 
@@ -32,9 +33,10 @@ resemble Vagrant workflows where `up`, `destroy`, `run` correspond closely to
 
 ## Installation
 
-Simply clone this repository and symlink the `ibt` script into a directory on
-your search path. These instructions assume that the `bin` directory within
-your home directory is on the search path:
+Ensure you have a working [Python 2.7][python] installation on the host machine
+as well as [Docker][docker]. Simply clone this repository and symlink the `ibt`
+script into a directory on your search path. These instructions assume that the
+`bin` directory within your home directory is on the search path:
 
 ```bash
 $ git clone https://github.com/rcook/ibt.git
@@ -154,4 +156,5 @@ Released under MIT License
 Copyright (C) 2016, Richard Cook. All rights reserved.
 
 [docker]: https://www.docker.com/
+[python]: https://www.python.org/downloads/
 [vagrant]: https://www.vagrantup.com/
