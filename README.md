@@ -30,6 +30,18 @@ This is not completely accidental. The workflows described above strongly
 resemble Vagrant workflows where `up`, `destroy`, `run` correspond closely to
 `up`, `destroy` and `ssh`.
 
+## Installation
+
+Simply clone this repository and symlink the `ibt` script into a directory on
+your search path. These instructions assume that the `bin` directory within
+your home directory is on the search path:
+
+```bash
+$ git clone https://github.com/rcook/ibt.git
+$ cd ibt
+$ ln -sf $PWD/ibt $HOME/bin/ibt
+```
+
 ## Standard commands
 
 * `up`: creates Docker image for the project
@@ -76,13 +88,7 @@ can be run to configure/make/run the project code:
 
 ### Example workflow
 
-First, symlink the `ibt` script into a directory on your search path, e.g.
-
-```bash
-$ ln -sf $PWD/ibt $HOME/bin/ibt
-```
-
-Now, you can use the `ibt` command within the `example` subdirectory:
+See contents of `example` subdirectory.
 
 ```bash
 $ cd example
