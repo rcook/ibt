@@ -1,4 +1,4 @@
-# ibt: The Isolated Build Tool
+# IBT: The Isolated Build Tool
 
 Simple wrappers around [Docker][docker] for fully isolated build environments
 
@@ -15,7 +15,7 @@ host as the root user, instead of the current user
 Note that this is a very personal list of perceived shortcomings. If these
 aren't issues for you, then don't use this tool!
 
-ibt makes Docker images and containers more development- and project-focused.
+IBT makes Docker images and containers more development- and project-focused.
 It encourages the following workflows:
 
 * Editing of source files is carried out predominantly on the _host_ machine
@@ -106,7 +106,7 @@ argv[1] = first
 argv[2] = second
 argv[3] = third
 $ ibt status
-ibt: The Isolated Build Tool
+IBT: The Isolated Build Tool
 
 Project information:
   Project directory:   /home/user/src/ibt

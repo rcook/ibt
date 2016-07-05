@@ -222,7 +222,7 @@ def do_status(ctx, args):
 
   (uid, gid) = uid_gid(ctx.project_dir)
 
-  print("ibt: The Isolated Build Tool\n")
+  print("IBT: The Isolated Build Tool\n")
   print("Project information:")
   print("  Project directory:   {}".format(ctx.project_dir))
   print("  Working directory:   {}".format(ctx.dir))
@@ -271,7 +271,7 @@ def main(dir, args):
 
   args.pop(0)
   if len(args) < 1:
-    print("ibt: The Isolated Build Tool\n")
+    print("IBT: The Isolated Build Tool\n")
     print("Commands:\n"
         "  up         Create Docker image for project\n"
         "  destroy    Destroy project's Docker image\n"
