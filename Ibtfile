@@ -1,3 +1,9 @@
 docker-image: ibt/debian-gcc-python
+
 forwarded-ports:
 - 8080:8080
+
+aliases:
+  cmake: run 'cd /ibt && mkdir build && cd build && cmake ..'
+  make: run 'cd /ibt/build && make'
+  exec: run 'cd /ibt/build && ./hello-world'

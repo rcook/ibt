@@ -11,6 +11,7 @@
 
 import hashlib
 import os
+import shlex
 import shutil
 import subprocess
 import sys
@@ -19,6 +20,10 @@ import yaml
 CONTAINER_PROJECT_DIR = "/ibt"
 CONTAINER_DOT_DIR = os.path.join(CONTAINER_PROJECT_DIR, ".ibt")
 SCRIPT_FILE_NAME = "temp.sh"
+
+def read_settings(ctx):
+  with open(ctx.ibt_file_name, "rt") as f:
+    return yaml.load(f)
 
 def uid_gid(dir):
   proc = subprocess.Popen(
@@ -66,8 +71,7 @@ def docker_image_remove(image_id):
     print("No Docker image {} to destroy".format(image_id))
 
 def make_run_command(ctx, container_working_dir, args=None):
-  with open(ctx.ibt_file_name, "rt") as f:
-    settings = yaml.load(f)
+  settings = read_settings(ctx)
 
   ports = []
   if "forwarded-ports" in settings:
@@ -137,8 +141,7 @@ def do_up(ctx, args):
   if len(args) > 0:
     raise RuntimeError("up takes no arguments")
 
-  with open(ctx.ibt_file_name, "rt") as f:
-    settings = yaml.load(f)
+  settings = read_settings(ctx)
 
   if not os.path.isdir(ctx.dot_dir):
     os.makedirs(ctx.dot_dir)
@@ -237,20 +240,7 @@ def do_status(ctx, args):
   print("  Temporary directory: {}".format("exists" if os.path.isdir(ctx.dot_dir) else "does not exist"))
   print("  Docker image:        {}".format("built" if docker_image_exists(ctx.image_id) else "not built"))
 
-def main(dir, args):
-  args.pop(0)
-  if len(args) < 1:
-    print("Commands:\n"
-        "  up         Create Docker image for project\n"
-        "  destroy    Destroy project's Docker image\n"
-        "  run        Run command inside Docker container\n"
-        "  script     Run script inside Docker container\n"
-        "  shell      Run shell inside Docker container\n"
-        "  status     Show project status\n")
-    return
-
-  ctx = Context(dir)
-
+def run_command(ctx, args):
   command = args.pop(0)
   if command == "up":
     do_up(ctx, args)
@@ -266,6 +256,32 @@ def main(dir, args):
     do_status(ctx, args)
   else:
     raise RuntimeError("Unsupported command {}".format(command))
+
+def main(dir, args):
+  ctx = Context(dir)
+  settings = read_settings(ctx)
+  aliases = settings["aliases"]
+
+  args.pop(0)
+  if len(args) < 1:
+    print("Commands:\n"
+        "  up         Create Docker image for project\n"
+        "  destroy    Destroy project's Docker image\n"
+        "  run        Run command inside Docker container\n"
+        "  script     Run script inside Docker container\n"
+        "  shell      Run shell inside Docker container\n"
+        "  status     Show project status\n")
+
+    if len(aliases) > 0:
+      print("\nProject aliases:\n")
+      for key in aliases:
+        print("  {} = {}".format(key, aliases[key]))
+
+  command = args[0]
+  if command in aliases:
+    run_command(ctx, shlex.split(aliases[command]))
+  else:
+    run_command(ctx, args)
 
 if __name__ == "__main__":
   main(os.getcwd(), list(sys.argv))
