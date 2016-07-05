@@ -62,6 +62,10 @@ def do_up(ctx, args):
 
   docker_image_build(ctx.image_id, ctx.project_dir)
 
+  dot_dir = os.path.join(ctx.project_dir, ".ibt")
+  if not os.path.isdir(dot_dir):
+    os.makedirs(dot_dir)
+
 def do_destroy(ctx, args):
   if len(args) > 0:
     raise RuntimeError("destroy takes no arguments")
