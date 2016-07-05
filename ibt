@@ -64,6 +64,24 @@ def docker_image_remove(image_id):
   else:
     print("No Docker image {} to destroy".format(image_id))
 
+def make_run_command(project_dir, image_id, container_working_dir, args):
+  (uid, gid) = uid_gid(project_dir)
+  front = [
+    "docker",
+    "run",
+    "-w",
+    container_working_dir,
+    "-u",
+    "{}:{}".format(uid, gid),
+    "-v",
+    "{}:{}".format(project_dir, CONTAINER_PROJECT_DIR),
+    "--rm",
+  ]
+  back = [
+    image_id
+  ]
+  return front + args + back
+
 def docker_run(image_id, project_dir, container_run_path):
   (uid, gid) = uid_gid(project_dir)
   subprocess.check_call([
@@ -202,19 +220,12 @@ def do_shell(ctx, args):
   rel_dir = os.path.relpath(ctx.dir, ctx.project_dir)
   (uid, gid) = uid_gid(ctx.project_dir)
 
-  subprocess.check_call([
-    "docker",
-    "run",
-    "-w",
+  command = make_run_command(
+    ctx.project_dir,
+    ctx.image_id,
     os.path.join(CONTAINER_PROJECT_DIR, rel_dir),
-    "-u",
-    "{}:{}".format(uid, gid),
-    "-v",
-    "{}:{}".format(ctx.project_dir, CONTAINER_PROJECT_DIR),
-    "--rm",
-    "-it",
-    ctx.image_id
-  ])
+    ["-it"])
+  subprocess.check_call(command)
 
 def main(dir, args):
   args.pop(0)
