@@ -264,6 +264,7 @@ def main(dir, args):
 
   args.pop(0)
   if len(args) < 1:
+    print("ibt: The Isolated Build Tool\n")
     print("Commands:\n"
         "  up         Create Docker image for project\n"
         "  destroy    Destroy project's Docker image\n"
@@ -273,7 +274,7 @@ def main(dir, args):
         "  status     Show project status\n")
 
     if len(aliases) > 0:
-      print("\nProject aliases:\n")
+      print("Project aliases:")
       for key in sorted(aliases):
         print("  {} = {}".format(key, aliases[key]))
 
