@@ -64,6 +64,21 @@ def docker_image_remove(image_id):
   else:
     print("No Docker image {} to destroy".format(image_id))
 
+def docker_run(image_id, project_dir, container_run_path):
+  (uid, gid) = uid_gid(project_dir)
+  subprocess.check_call([
+    "docker",
+    "run",
+    "-u",
+    "{}:{}".format(uid, gid),
+    "-v",
+    "{}:{}".format(project_dir, CONTAINER_PROJECT_DIR),
+    "--rm",
+    image_id,
+    "/bin/sh",
+    container_run_path
+  ])
+    
 class Context(object):
   def __init__(self, dir):
     self._dir = dir
@@ -142,7 +157,6 @@ def do_run(ctx, args):
     raise RuntimeError("Project has not been upped")
 
   rel_dir = os.path.relpath(ctx.dir, ctx.project_dir)
-  (uid, gid) = uid_gid(ctx.project_dir)
 
   local_run_path = os.path.join(ctx.dot_dir, "run.sh")
   container_run_path = os.path.join(CONTAINER_DOT_DIR, "run.sh")
@@ -152,19 +166,8 @@ def do_run(ctx, args):
     f.write("cd {}/{}\n".format(CONTAINER_PROJECT_DIR, rel_dir))
     f.write(" ".join(args) + "\n")
 
-  subprocess.check_call([
-    "docker",
-    "run",
-    "-u",
-    "{}:{}".format(uid, gid),
-    "-v",
-    "{}:{}".format(ctx.project_dir, CONTAINER_PROJECT_DIR),
-    "--rm",
-    ctx.image_id,
-    "/bin/sh",
-    container_run_path
-  ])
-    
+  docker_run(ctx.image_id, ctx.project_dir, container_run_path)
+
 def do_script(ctx, args):
   if len(args) != 1:
     raise RuntimeError("script takes one argument")
@@ -173,7 +176,6 @@ def do_script(ctx, args):
     raise RuntimeError("Project has not been upped")
 
   rel_dir = os.path.relpath(ctx.dir, ctx.project_dir)
-  (uid, gid) = uid_gid(ctx.project_dir)
 
   local_run_path = os.path.join(ctx.dot_dir, "run.sh")
   container_run_path = os.path.join(CONTAINER_DOT_DIR, "run.sh")
@@ -188,18 +190,7 @@ def do_script(ctx, args):
     f.write("chmod +x {}\n".format(container_script_path))
     f.write(container_script_path + "\n")
 
-  subprocess.check_call([
-    "docker",
-    "run",
-    "-u",
-    "{}:{}".format(uid, gid),
-    "-v",
-    "{}:{}".format(ctx.project_dir, CONTAINER_PROJECT_DIR),
-    "--rm",
-    ctx.image_id,
-    "/bin/sh",
-    container_run_path
-  ])
+  docker_run(ctx.image_id, ctx.project_dir, container_run_path)
 
 def do_shell(ctx, args):
   if len(args) != 0:
