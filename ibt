@@ -277,6 +277,8 @@ def main(dir, args):
       for key in aliases:
         print("  {} = {}".format(key, aliases[key]))
 
+    return
+
   command = args[0]
   if command in aliases:
     run_command(ctx, shlex.split(aliases[command]))
