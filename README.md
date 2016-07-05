@@ -76,6 +76,14 @@ can be run to configure/make/run the project code:
 
 ### Example workflow
 
+First, symlink the `ibt` script into a directory on your search path, e.g.
+
+```bash
+$ ln -sf $PWD/ibt $HOME/bin/ibt
+```
+
+Now, you can use the `ibt` command within the `example` subdirectory:
+
 ```bash
 $ cd example
 $ ibt up
