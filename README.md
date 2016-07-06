@@ -40,8 +40,7 @@ script into a directory on your search path. These instructions assume that the
 
 ```bash
 $ git clone https://github.com/rcook/ibt.git
-$ cd ibt
-$ ln -sf $PWD/ibt $HOME/bin/ibt
+$ ln -sf $PWD/ibt/ibt $HOME/bin/ibt
 ```
 
 ## Standard commands
