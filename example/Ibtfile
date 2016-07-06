@@ -4,7 +4,7 @@ forwarded-ports:
 - 8080:8080
 
 aliases:
-  cmake: run 'cd /ibt && if [ ! -d build ]; then mkdir build; fi && cd build && cmake -DCMAKE_BUILD_TYPE=Debug ..'
+  cmake: run 'cd /ibt && mkdir -p build && cd build && cmake -DCMAKE_BUILD_TYPE=Debug ..'
   make: run 'cd /ibt/build && make'
   debug: shell /bin/sh -c 'cd /ibt/build && gdb ./hello-world'
   exec: run 'cd /ibt/build && ./hello-world'
