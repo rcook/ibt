@@ -100,7 +100,9 @@ def make_run_command(ctx, container_working_dir, args=None):
         user_name,
         "-v",
         "{}:{}".format(ctx.project_dir, ctx.container_project_dir),
-        "--rm"
+        "--rm",
+        "-e",
+        "IBTPROJECTDIR={}".format(ctx.container_project_dir)
     ] + ports
     back = [ctx.image_id]
 
