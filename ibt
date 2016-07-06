@@ -39,7 +39,15 @@ def read_settings(ctx):
     with open(ctx.ibt_file_name, "rt") as f:
         return yaml.load(f)
 
-def run_process(command):
+def call_process(command):
+    proc = subprocess.Popen(
+        command,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE)
+    proc.communicate()
+    return proc.returncode == 0
+
+def check_process(command):
     proc = subprocess.Popen(
         command,
         stdout=subprocess.PIPE,
@@ -50,29 +58,30 @@ def run_process(command):
     return out
 
 def uid_gid(dir):
-    return run_process(["stat", "-c", "%u:%g", dir]).strip().split(":")
+    return check_process(["stat", "-c", "%u:%g", dir]).strip().split(":")
+
+def docker_installed():
+    try:
+        return call_process(["docker", "--version"])
+    except OSError:
+        return False
 
 def docker_image_exists(image_id):
-    proc = subprocess.Popen(
-        ["docker", "inspect", image_id],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE)
-    proc.communicate()
-    return proc.returncode == 0
+    return call_process(["docker", "inspect", image_id])
 
 def docker_image_build(image_id, project_dir):
     if docker_image_exists(image_id):
         print("Docker image {} already built".format(image_id))
     else:
         print("Building Docker image {}".format(image_id))
-        run_process(["docker", "build", "-t", image_id, project_dir])
+        check_process(["docker", "build", "-t", image_id, project_dir])
 
 def docker_image_remove(image_id):
     if docker_image_exists(image_id):
         print("Destroying Docker image {}".format(image_id))
     else:
         print("No Docker image {} to destroy".format(image_id))
-        run_process(["docker", "rmi", image_id])
+        check_process(["docker", "rmi", image_id])
 
 def make_run_command(ctx, container_working_dir, args=None):
     settings = read_settings(ctx)
@@ -291,6 +300,10 @@ def main_inner(ctx, args):
         run_command(ctx, args)
 
 def main(dir, args):
+    if not docker_installed():
+        print("Please install Docker")
+        return
+
     ibt_file_name = find_ibt_file(dir)
     if ibt_file_name is None:
         print("No Ibtfile configuration file found")
