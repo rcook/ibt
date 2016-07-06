@@ -25,6 +25,9 @@ SCRIPT_FILE_NAME = "temp.sh"
 
 @contextlib.contextmanager
 def transaction_lock(ctx):
+    if not os.path.isdir(ctx.dot_dir):
+        os.makedirs(ctx.dot_dir)
+
     with open(os.path.join(ctx.dot_dir, "lock"), "w") as f:
         try:
             fcntl.lockf(f, fcntl.LOCK_EX | fcntl.LOCK_NB)
@@ -132,9 +135,6 @@ def do_up(ctx, args):
         raise RuntimeError("up takes no arguments")
 
     settings = read_settings(ctx)
-
-    if not os.path.isdir(ctx.dot_dir):
-        os.makedirs(ctx.dot_dir)
 
     with open(os.path.join(ctx.dot_dir, ".dockerignore"), "wt") as f:
         f.write("*\n")
