@@ -6,7 +6,7 @@ environments
 ## What's the point of this tool?
 
 Docker is great for building isolated environments for builds or applications.
-For my tastes, however, it has a few usability issues associated with it:
+For my tastes, however, there are a few usability issues associated with it:
 
 * The commands are fiddly to use and difficult to remember
 * Docker containers run as root by default resulting in files created on the
