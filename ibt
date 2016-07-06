@@ -13,6 +13,7 @@ import contextlib
 import fcntl
 import hashlib
 import os
+import re
 import shlex
 import shutil
 import subprocess
@@ -20,6 +21,15 @@ import sys
 import yaml
 
 SCRIPT_FILE_NAME = "temp.sh"
+
+# See https://hg.python.org/cpython/file/3.4/Lib/shlex.py
+FIND_UNSAFE = re.compile(r'[^\w@%+=:,./-]').search
+def shell_quote(s):
+    if not s:
+        return "''"
+    if FIND_UNSAFE(s) is None:
+        return s
+    return "'" + s.replace("'", "'\"'\"'") + "'"
 
 @contextlib.contextmanager
 def try_acquire_lock(ctx):
@@ -186,7 +196,7 @@ def do_run(ctx, args):
 
     with open(local_run_path, "wt") as f:
         f.write("#!/bin/sh\n")
-        f.write(" ".join(args) + "\n")
+        f.write(" ".join(map(shell_quote, args)) + "\n")
 
     docker_run(ctx, container_working_dir, container_run_path)
 
