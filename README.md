@@ -152,6 +152,7 @@ Destroying Docker image ibt-789dbc504a0690d786ddd43474dfbcc5
 ## Licence
 
 Released under MIT License
+
 Copyright (C) 2016, Richard Cook. All rights reserved.
 
 [docker]: https://www.docker.com/
