@@ -2,7 +2,7 @@
 
 ###############################################################################
 #
-# IBT: The Isolated Build Tool
+# IBT: Isolated Build Tool
 # Copyright (C) 2016, Richard Cook. All rights reserved.
 #
 # Simple wrappers around Docker etc. for fully isolated build environments
@@ -212,7 +212,7 @@ def do_status(ctx, args):
 
   (uid, gid) = uid_gid(ctx.project_dir)
 
-  print("IBT: The Isolated Build Tool\n")
+  print("IBT: Isolated Build Tool\n")
   print("Project information:")
   print("  Project directory:   {}".format(ctx.project_dir))
   print("  Working directory:   {}".format(ctx.dir))
@@ -261,7 +261,7 @@ def main(dir, args):
 
   args.pop(0)
   if len(args) < 1:
-    print("IBT: The Isolated Build Tool\n")
+    print("IBT: Isolated Build Tool\n")
     print("Commands:\n"
         "  up         Create Docker image for project\n"
         "  destroy    Destroy project's Docker image\n"

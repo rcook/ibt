@@ -1,4 +1,4 @@
-# IBT: The Isolated Build Tool
+# IBT: Isolated Build Tool
 
 Simple Python wrapper script around [Docker][docker] for fully isolated build
 environments
@@ -123,7 +123,7 @@ argv[1] = first
 argv[2] = second
 argv[3] = third
 $ ibt status
-IBT: The Isolated Build Tool
+IBT: Isolated Build Tool
 
 Project information:
   Project directory:   /home/user/src/ibt/example
