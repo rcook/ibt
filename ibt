@@ -19,8 +19,6 @@ import subprocess
 import sys
 import yaml
 
-CONTAINER_PROJECT_DIR = "/ibt"
-CONTAINER_DOT_DIR = os.path.join(CONTAINER_PROJECT_DIR, ".ibt")
 SCRIPT_FILE_NAME = "temp.sh"
 
 @contextlib.contextmanager
@@ -101,7 +99,7 @@ def make_run_command(ctx, container_working_dir, args=None):
         "-u",
         user_name,
         "-v",
-        "{}:{}".format(ctx.project_dir, CONTAINER_PROJECT_DIR),
+        "{}:{}".format(ctx.project_dir, ctx.container_project_dir),
         "--rm"
     ] + ports
     back = [ctx.image_id]
@@ -120,6 +118,8 @@ class Context(object):
         self._image_id = "ibt-{}".format(self._project_id)
         self._project_dir = os.path.dirname(self._ibt_file_name)
         self._dot_dir = os.path.join(self._project_dir, ".ibt")
+        self._container_project_dir = "/{}".format(os.path.basename(self._project_dir))
+        self._container_dot_dir = os.path.join(self._container_project_dir, ".ibt")
 
     @property
     def ibt_file_name(self): return self._ibt_file_name
@@ -138,6 +138,12 @@ class Context(object):
 
     @property
     def dot_dir(self): return self._dot_dir
+
+    @property
+    def container_project_dir(self): return self._container_project_dir
+
+    @property
+    def container_dot_dir(self): return self._container_dot_dir
 
 def do_up(ctx, args):
     if len(args) > 0:
@@ -171,10 +177,10 @@ def do_run(ctx, args):
         raise RuntimeError("Project has not been upped")
 
     rel_dir = os.path.relpath(ctx.dir, ctx.project_dir)
-    container_working_dir = os.path.join(CONTAINER_PROJECT_DIR, rel_dir)
+    container_working_dir = os.path.join(ctx.container_project_dir, rel_dir)
 
     local_run_path = os.path.join(ctx.dot_dir, SCRIPT_FILE_NAME)
-    container_run_path = os.path.join(CONTAINER_DOT_DIR, SCRIPT_FILE_NAME)
+    container_run_path = os.path.join(ctx.container_dot_dir, SCRIPT_FILE_NAME)
 
     with open(local_run_path, "wt") as f:
         f.write("#!/bin/sh\n")
@@ -190,13 +196,13 @@ def do_script(ctx, args):
         raise RuntimeError("Project has not been upped")
 
     rel_dir = os.path.relpath(ctx.dir, ctx.project_dir)
-    container_working_dir = os.path.join(CONTAINER_PROJECT_DIR, rel_dir)
+    container_working_dir = os.path.join(ctx.container_project_dir, rel_dir)
 
     local_run_path = os.path.join(ctx.dot_dir, SCRIPT_FILE_NAME)
-    container_run_path = os.path.join(CONTAINER_DOT_DIR, SCRIPT_FILE_NAME)
+    container_run_path = os.path.join(ctx.container_dot_dir, SCRIPT_FILE_NAME)
 
     shutil.copyfile(args[0], os.path.join(ctx.dot_dir, "script"))
-    container_script_path = os.path.join(CONTAINER_DOT_DIR, "script")
+    container_script_path = os.path.join(ctx.container_dot_dir, "script")
 
     with open(local_run_path, "wt") as f:
         f.write("#!/bin/sh\n")
@@ -210,7 +216,7 @@ def do_shell(ctx, args):
         raise RuntimeError("Project has not been upped")
 
     rel_dir = os.path.relpath(ctx.dir, ctx.project_dir)
-    container_working_dir = os.path.join(CONTAINER_PROJECT_DIR, rel_dir)
+    container_working_dir = os.path.join(ctx.container_project_dir, rel_dir)
 
     command = make_run_command(ctx, container_working_dir, ["-it"]) + args
     subprocess.check_call(command)
