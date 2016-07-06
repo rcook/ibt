@@ -1,4 +1,4 @@
-docker-image: ibt/debian-gcc-python
+docker-image: ibt/debian-gcc5
 
 forwarded-ports:
 - 8080:8080
