@@ -24,7 +24,7 @@ CONTAINER_DOT_DIR = os.path.join(CONTAINER_PROJECT_DIR, ".ibt")
 SCRIPT_FILE_NAME = "temp.sh"
 
 @contextlib.contextmanager
-def transaction_lock(ctx):
+def try_acquire_lock(ctx):
     if not os.path.isdir(ctx.dot_dir):
         os.makedirs(ctx.dot_dir)
 
@@ -297,7 +297,7 @@ def main(dir, args):
         return
 
     ctx = Context(dir, ibt_file_name)
-    with transaction_lock(ctx) as result:
+    with try_acquire_lock(ctx) as result:
         if result:
             main_inner(ctx, args)
         else:
