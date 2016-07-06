@@ -9,6 +9,8 @@
 #
 ###############################################################################
 
+import contextlib
+import fcntl
 import hashlib
 import os
 import shlex
@@ -20,6 +22,15 @@ import yaml
 CONTAINER_PROJECT_DIR = "/ibt"
 CONTAINER_DOT_DIR = os.path.join(CONTAINER_PROJECT_DIR, ".ibt")
 SCRIPT_FILE_NAME = "temp.sh"
+
+@contextlib.contextmanager
+def transaction_lock(ctx):
+    with open(os.path.join(ctx.dot_dir, "lock"), "w") as f:
+        try:
+            fcntl.lockf(f, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            yield True
+        except IOError:
+            yield False
 
 def read_settings(ctx):
     with open(ctx.ibt_file_name, "rt") as f:
@@ -250,13 +261,7 @@ def find_ibt_file(dir):
     parent_dir = os.path.dirname(dir)
     return None if parent_dir == dir else find_ibt_file(parent_dir)
 
-def main(dir, args):
-    ibt_file_name = find_ibt_file(dir)
-    if ibt_file_name is None:
-        print("No Ibtfile configuration file found")
-        return
-
-    ctx = Context(dir, ibt_file_name)
+def main_inner(ctx, args):
     settings = read_settings(ctx)
     aliases = settings.get("aliases", [])
 
@@ -284,6 +289,19 @@ def main(dir, args):
         run_command(ctx, shlex.split(aliases[command]) + args[1:])
     else:
         run_command(ctx, args)
+
+def main(dir, args):
+    ibt_file_name = find_ibt_file(dir)
+    if ibt_file_name is None:
+        print("No Ibtfile configuration file found")
+        return
+
+    ctx = Context(dir, ibt_file_name)
+    with transaction_lock(ctx) as result:
+        if result:
+            main_inner(ctx, args)
+        else:
+            print("Another instance of ibt is already running")
 
 if __name__ == "__main__":
     main(os.getcwd(), list(sys.argv))
