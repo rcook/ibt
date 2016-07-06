@@ -92,27 +92,31 @@ can be run to configure/make/run the project code:
 See contents of `example` subdirectory.
 
 ```bash
-$ cd example
+$ cd example/
 $ ibt up
 Building Docker image ibt-789dbc504a0690d786ddd43474dfbcc5
 $ ibt cmake
--- The C compiler identification is GNU 4.9.2
--- The CXX compiler identification is GNU 4.9.2
+-- The C compiler identification is GNU 5.4.0
+-- The CXX compiler identification is GNU 5.4.0
 -- Check for working C compiler: /usr/bin/cc
 -- Check for working C compiler: /usr/bin/cc -- works
 -- Detecting C compiler ABI info
 -- Detecting C compiler ABI info - done
--- Check for working CXX compiler: /usr/bin/c++
--- Check for working CXX compiler: /usr/bin/c++ -- works
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Check for working CXX compiler: /usr/bin/g++
+-- Check for working CXX compiler: /usr/bin/g++ -- works
 -- Detecting CXX compiler ABI info
 -- Detecting CXX compiler ABI info - done
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
 -- Configuring done
 -- Generating done
 -- Build files have been written to: /example/build
 $ ibt make
 Scanning dependencies of target hello-world
-[100%] Building CXX object CMakeFiles/hello-world.dir/hello-world.cpp.o
-Linking CXX executable hello-world
+[ 50%] Building CXX object CMakeFiles/hello-world.dir/hello-world.cpp.o
+[100%] Linking CXX executable hello-world
 [100%] Built target hello-world
 $ ibt exec first second third
 Hello world
@@ -131,10 +135,12 @@ Project information:
   Configuration file:  /home/user/src/ibt/example/Ibtfile
   Temporary directory: /home/user/src/ibt/example/.ibt
 User information:
-  UID:                 1002
-  GID:                 1002
-Docker information:
+  User:                user (1002)
+  Group:               user (1002)
+Docker container information:
   Docker image ID:     ibt-789dbc504a0690d786ddd43474dfbcc5
+  Project directory:   /example
+  Temporary directory: /example/.ibt
 IBT status:
   Temporary directory: exists
   Docker image:        built
