@@ -90,12 +90,9 @@ def docker_run(ctx, container_working_dir, container_run_path):
     subprocess.check_call(command)
     
 class Context(object):
-    def __init__(self, dir):
+    def __init__(self, dir, ibt_file_name):
         self._dir = dir
-        self._ibt_file_name = self._find_ibt_file(self._dir)
-        if self._ibt_file_name is None:
-            raise RuntimeError("ibt command run outside project")
-
+        self._ibt_file_name = ibt_file_name
         self._project_id = hashlib.md5(self._ibt_file_name).hexdigest()
         self._image_id = "ibt-{}".format(self._project_id)
         self._project_dir = os.path.dirname(self._ibt_file_name)
@@ -118,14 +115,6 @@ class Context(object):
 
     @property
     def dot_dir(self): return self._dot_dir
-
-    @staticmethod
-    def _find_ibt_file(dir):
-        file_name = os.path.join(dir, "Ibtfile")
-        if os.path.isfile(file_name):
-            return file_name
-        parent_dir = os.path.dirname(dir)
-        return None if parent_dir == dir else Context._find_ibt_file(parent_dir)
 
 def do_up(ctx, args):
     if len(args) > 0:
@@ -254,8 +243,20 @@ def run_command(ctx, args):
     else:
         raise RuntimeError("Unsupported command {}".format(command))
 
+def find_ibt_file(dir):
+    file_name = os.path.join(dir, "Ibtfile")
+    if os.path.isfile(file_name):
+        return file_name
+    parent_dir = os.path.dirname(dir)
+    return None if parent_dir == dir else find_ibt_file(parent_dir)
+
 def main(dir, args):
-    ctx = Context(dir)
+    ibt_file_name = find_ibt_file(dir)
+    if ibt_file_name is None:
+        print("No Ibtfile configuration file found")
+        return
+
+    ctx = Context(dir, ibt_file_name)
     settings = read_settings(ctx)
     aliases = settings.get("aliases", [])
 
