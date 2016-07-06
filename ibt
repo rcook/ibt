@@ -57,8 +57,8 @@ def check_process(command):
         raise RuntimeError("Popen command failed: {}".format(error))
     return out
 
-def uid_gid(dir):
-    return check_process(["stat", "-c", "%u:%g", dir]).strip().split(":")
+def user_info(dir):
+    return check_process(["stat", "-c", "%u:%G:%g:%U", dir]).strip().split(":")
 
 def docker_installed():
     try:
@@ -92,14 +92,14 @@ def make_run_command(ctx, container_working_dir, args=None):
             ports.append("-p")
             ports.append(entry)
 
-    (uid, gid) = uid_gid(ctx.project_dir)
+    (_, _, _, user_name) = user_info(ctx.project_dir)
     front = [
         "docker",
         "run",
         "-w",
         container_working_dir,
         "-u",
-        "{}:{}".format(uid, gid),
+        user_name,
         "-v",
         "{}:{}".format(ctx.project_dir, CONTAINER_PROJECT_DIR),
         "--rm"
@@ -148,12 +148,12 @@ def do_up(ctx, args):
     with open(os.path.join(ctx.dot_dir, ".dockerignore"), "wt") as f:
         f.write("*\n")
 
-    (uid, gid) = uid_gid(ctx.project_dir)
+    (uid, group_name, gid, user_name) = user_info(ctx.project_dir)
 
     with open(os.path.join(ctx.dot_dir, "Dockerfile"), "wt") as f:
         f.write("FROM {}\n".format(settings["docker-image"]))
-        f.write("RUN groupadd -g {} ibt\n".format(gid))
-        f.write("RUN useradd -u {} -g {} ibt\n".format(uid, gid))
+        f.write("RUN groupadd -g {} {}\n".format(gid, group_name))
+        f.write("RUN useradd -u {} -g {} {}\n".format(uid, gid, user_name))
 
     docker_image_build(ctx.image_id, ctx.dot_dir)
 
@@ -219,7 +219,7 @@ def do_status(ctx, args):
     if len(args) > 0:
         raise RuntimeError("status takes no arguments")
 
-    (uid, gid) = uid_gid(ctx.project_dir)
+    (uid, group_name, gid, user_name) = user_info(ctx.project_dir)
 
     print("IBT: Isolated Build Tool\n")
     print("Project information:")
@@ -229,8 +229,8 @@ def do_status(ctx, args):
     print("  Configuration file:  {}".format(ctx.ibt_file_name))
     print("  Temporary directory: {}".format(ctx.dot_dir))
     print("User information:")
-    print("  UID:                 {}".format(uid))
-    print("  GID:                 {}".format(gid))
+    print("  User:                {} ({})".format(user_name, uid))
+    print("  Group:               {}".format(group_name, gid))
     print("Docker information:")
     print("  Docker image ID:     {}".format(ctx.image_id))
     print("IBT status:")
