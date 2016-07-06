@@ -108,7 +108,7 @@ $ ibt cmake
 -- Detecting CXX compiler ABI info - done
 -- Configuring done
 -- Generating done
--- Build files have been written to: /ibt/build
+-- Build files have been written to: /example/build
 $ ibt make
 Scanning dependencies of target hello-world
 [100%] Building CXX object CMakeFiles/hello-world.dir/hello-world.cpp.o
@@ -140,10 +140,10 @@ IBT status:
   Docker image:        built
 
 Project aliases:
-  cmake = run 'cd /ibt && if [ ! -d build ]; then mkdir build; fi && cd build && cmake -DCMAKE_BUILD_TYPE=Debug ..'
-  debug = shell /bin/sh -c 'cd /ibt/build && gdb ./hello-world'
-  exec = run 'cd /ibt/build && ./hello-world'
-  make = run 'cd /ibt/build && make'
+  cmake = run 'cd $IBTPROJECTDIR && mkdir -p build && cd build && cmake -DCMAKE_BUILD_TYPE=Debug ..'
+  debug = shell /bin/sh -c 'cd $IBTPROJECTDIR/build && gdb ./hello-world'
+  exec = run 'cd $IBTPROJECTDIR/build && ./hello-world'
+  make = run 'cd $IBTPROJECTDIR/build && make'
 
 $ ibt destroy
 Destroying Docker image ibt-789dbc504a0690d786ddd43474dfbcc5
