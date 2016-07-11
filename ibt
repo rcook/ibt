@@ -163,6 +163,10 @@ def do_destroy(ctx, args):
 
     docker_image_remove(ctx.image_id)
 
+def do_reup(ctx, args):
+    do_destroy(ctx, args)
+    do_up(ctx, args)
+
 def do_run(ctx, args):
     if len(args) == 0:
         raise RuntimeError("run takes one or more arguments")
@@ -270,6 +274,8 @@ def run_command(ctx, args):
     command = args.pop(0)
     if command == "destroy":
         do_destroy(ctx, args)
+    elif command == "reup":
+        do_reup(ctx, args)
     elif command == "run":
         do_run(ctx, args)
     elif command == "script":
@@ -298,6 +304,7 @@ def main_inner(ctx, args):
         print("IBT: Isolated Build Tool\n")
         print("Commands:\n"
             "  destroy    Destroy project's Docker image\n"
+            "  reup       Equivalent to 'destroy' followed by 'up'\n"
             "  run        Run command inside Docker container\n"
             "  script     Run script inside Docker container\n"
             "  shell      Run shell inside Docker container\n"
