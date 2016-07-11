@@ -22,6 +22,7 @@ import yaml
 
 SCRIPT_FILE_NAME = "temp.sh"
 
+"""
 # See https://hg.python.org/cpython/file/3.4/Lib/shlex.py
 FIND_UNSAFE = re.compile(r'[^\w@%+=:,./-]').search
 def shell_quote(s):
@@ -30,6 +31,7 @@ def shell_quote(s):
     if FIND_UNSAFE(s) is None:
         return s
     return "'" + s.replace("'", "'\"'\"'") + "'"
+"""
 
 @contextlib.contextmanager
 def try_acquire_lock(ctx):
@@ -195,7 +197,7 @@ def do_run(ctx, args):
 
     with open(local_run_path, "wt") as f:
         f.write("#!/bin/sh\n")
-        f.write(" ".join(map(shell_quote, args)) + "\n")
+        f.write(" ".join(args) + "\n")
 
     docker_run(ctx, container_working_dir, container_run_path)
 
@@ -342,7 +344,7 @@ def main_inner(ctx, args):
 
     command = args[0]
     if command in aliases:
-        run_command(ctx, shlex.split(aliases[command]) + args[1:])
+        run_command(ctx, shlex.split(aliases[command]))
     else:
         run_command(ctx, args)
 
