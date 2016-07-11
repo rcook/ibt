@@ -294,7 +294,6 @@ def main_inner(ctx, args):
     settings = read_settings(ctx)
     aliases = settings.get("aliases", [])
 
-    args.pop(0)
     if len(args) < 1:
         print("IBT: Isolated Build Tool\n")
         print("Commands:\n"
@@ -320,6 +319,8 @@ def main_inner(ctx, args):
         run_command(ctx, args)
 
 def main(dir, args):
+    args.pop(0)
+
     if not docker_installed():
         print("Please install Docker")
         return
@@ -330,6 +331,13 @@ def main(dir, args):
         return
 
     ctx = Context(dir, ibt_file_name)
+
+    # Special-case the "status" command to report status even
+    # if .ibt directory has not been created yet
+    if not os.path.isdir(ctx.dot_dir) and args == ["status"]:
+        do_status(ctx, [])
+        return
+
     with try_acquire_lock(ctx) as result:
         if result:
             main_inner(ctx, args)
