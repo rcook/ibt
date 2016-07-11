@@ -68,6 +68,9 @@ def check_process(command):
 def user_info(dir):
     return check_process(["stat", "-c", "%u:%G:%g:%U", dir]).strip().split(":")
 
+def resolve_local_path(ctx, path):
+    return os.path.abspath(os.path.join(ctx.project_dir, path))
+
 def docker_installed():
     try:
         return call_process(["docker", "--version"])
@@ -94,11 +97,21 @@ def docker_image_remove(image_id):
 def make_run_command(ctx, container_working_dir, args=None):
     settings = read_settings(ctx)
 
-    ports = []
-    if "ports" in settings:
-        for entry in settings["ports"]:
-            ports.append("-p")
-            ports.append(entry)
+    additional_args = []
+
+    ports = settings.get("port", None)
+    if ports is not None:
+        for entry in ports:
+            additional_args.append("-p")
+            additional_args.append(entry)
+
+    volumes = settings.get("volumes", None)
+    if volumes is not None:
+        for key in volumes:
+            additional_args.append("-v")
+            local_dir = resolve_local_path(ctx, key)
+            container_dir = volumes[key]
+            additional_args.append("{}:{}".format(local_dir, container_dir))
 
     (_, _, _, user_name) = user_info(ctx.project_dir)
     front = [
@@ -113,7 +126,7 @@ def make_run_command(ctx, container_working_dir, args=None):
         "--rm",
         "-e",
         "IBTPROJECTDIR={}".format(ctx.container_project_dir)
-    ] + ports
+    ] + additional_args
     back = [ctx.image_id]
 
     return front + back if args is None else front + args + back
@@ -244,8 +257,16 @@ def do_status(ctx, args):
     print("  Docker image:        {}".format("built" if docker_image_exists(ctx.image_id) else "not built"))
 
     settings = read_settings(ctx)
-    aliases = settings.get("aliases", [])
-    if len(aliases) > 0:
+
+    volumes = settings.get("volumes", None)
+    if volumes is not None and len(volumes) > 0:
+        print("\nProject volumes:")
+        for key in sorted(volumes):
+            local_dir = resolve_local_path(ctx, key)
+            print("  {} = {}".format(local_dir, volumes[key]))
+
+    aliases = settings.get("aliases", None)
+    if aliases is not None and len(aliases) > 0:
         print("\nProject aliases:")
         for key in sorted(aliases):
             print("  {} = {}".format(key, aliases[key]))
@@ -298,7 +319,7 @@ def find_ibt_file(dir):
 
 def main_inner(ctx, args):
     settings = read_settings(ctx)
-    aliases = settings.get("aliases", [])
+    aliases = settings.get("aliases", None)
 
     if len(args) < 1:
         print("IBT: Isolated Build Tool\n")
@@ -311,7 +332,7 @@ def main_inner(ctx, args):
             "  status     Show project status\n"
             "  up         Create Docker image for project")
 
-        if len(aliases) > 0:
+        if aliases is not None and len(aliases) > 0:
             print("\nProject aliases:")
             for key in sorted(aliases):
                 print("  {} = {}".format(key, aliases[key]))

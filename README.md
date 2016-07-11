@@ -58,6 +58,8 @@ $ ln -sf $PWD/ibt/ibt $HOME/bin/ibt
 * `docker-image`: specifies base Docker image for project
 * `ports`: (optional) one or more host:container port pairs to
 configure port forwarding
+* `volumes`: (optional) one or more additional volumes to mount inside
+container
 
 ## Sample project
 
