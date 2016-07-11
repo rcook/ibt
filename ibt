@@ -95,8 +95,8 @@ def make_run_command(ctx, container_working_dir, args=None):
     settings = read_settings(ctx)
 
     ports = []
-    if "forwarded-ports" in settings:
-        for entry in settings["forwarded-ports"]:
+    if "ports" in settings:
+        for entry in settings["ports"]:
             ports.append("-p")
             ports.append(entry)
 

@@ -56,7 +56,7 @@ $ ln -sf $PWD/ibt/ibt $HOME/bin/ibt
 
 * `aliases`: (optional) one or more project-specific command aliases
 * `docker-image`: specifies base Docker image for project
-* `forwarded-ports`: (optional) one or more host:container port pairs to
+* `ports`: (optional) one or more host:container port pairs to
 configure port forwarding
 
 ## Sample project

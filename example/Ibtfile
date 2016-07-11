@@ -2,7 +2,7 @@
 
 docker-image: ibt/debian-gcc5
 
-forwarded-ports:
+ports:
 - 8080:8080
 
 aliases:
