@@ -8,7 +8,6 @@ SCRIPT_FILE_NAME = "temp.sh"
 def get_commands():
     if get_commands.commands is None:
         from ibtimpl.destroy_command import DestroyCommand
-        from ibtimpl.docker_build_command import DockerBuildCommand
         from ibtimpl.help_command import HelpCommand
         from ibtimpl.run_command import RunCommand
         from ibtimpl.script_command import ScriptCommand
@@ -18,7 +17,6 @@ def get_commands():
 
         commands = [
             DestroyCommand(),
-            DockerBuildCommand(),
             HelpCommand(),
             RunCommand(),
             ScriptCommand(),
