@@ -58,6 +58,12 @@ class StatusCommand(Command):
         if aliases is not None and len(aliases) > 0:
             print("\nProject aliases:")
             for key in sorted(aliases):
-                print("  {} = {}".format(key, aliases[key]))
+                alias = aliases[key]
+                if isinstance(alias, list):
+                    print("  {}:".format(key))
+                    for line in alias:
+                        print("  - {}".format(line))
+                else:
+                    print("  {} = {}".format(key, alias))
 
         print("")

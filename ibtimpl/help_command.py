@@ -39,6 +39,12 @@ class HelpCommand(Command):
         if has_aliases:
             print("\nProject aliases:")
             for key in sorted(aliases):
-                print("  {}  {}".format(key.ljust(max_name_len), aliases[key]))
+                alias = aliases[key]
+                if isinstance(alias, list):
+                    print("  {}:".format(key))
+                    for line in alias:
+                        print("  - {}".format(line))
+                else:
+                    print("  {}  {}".format(key.ljust(max_name_len), alias))
 
         print("")
