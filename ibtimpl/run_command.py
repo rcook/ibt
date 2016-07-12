@@ -12,6 +12,7 @@ import os
 
 from ibtimpl.command import *
 from ibtimpl.docker_util import *
+from ibtimpl.util import *
 
 class RunCommand(Command):
     def __init__(self):
@@ -32,9 +33,5 @@ class RunCommand(Command):
         local_run_path = os.path.join(ctx.dot_dir, SCRIPT_FILE_NAME)
         container_run_path = os.path.join(ctx.container_dot_dir, SCRIPT_FILE_NAME)
 
-        with open(local_run_path, "wt") as f:
-            f.write("#!/bin/sh\n")
-            for line in lines:
-                f.write(line + "\n")
-
+        make_shell_script(local_run_path, lines)
         docker_run(ctx, container_working_dir, container_run_path)

@@ -1,10 +1,14 @@
+import contextlib
+import os
 import subprocess
+import tempfile
 
 SCRIPT_FILE_NAME = "temp.sh"
 
 def get_commands():
     if get_commands.commands is None:
         from ibtimpl.destroy_command import DestroyCommand
+        from ibtimpl.docker_build_command import DockerBuildCommand
         from ibtimpl.help_command import HelpCommand
         from ibtimpl.run_command import RunCommand
         from ibtimpl.script_command import ScriptCommand
@@ -14,6 +18,7 @@ def get_commands():
 
         commands = [
             DestroyCommand(),
+            DockerBuildCommand(),
             HelpCommand(),
             RunCommand(),
             ScriptCommand(),
@@ -48,3 +53,19 @@ def check_process(command):
 
 def user_info(dir):
     return check_process(["stat", "-c", "%u:%G:%g:%U", dir]).strip().split(":")
+
+def make_shell_script(path, lines):
+    with open(path, "wt") as f:
+        f.write("#!/bin/sh\n")
+        for line in lines:
+            f.write(line + "\n")
+
+@contextlib.contextmanager
+def temp_file():
+    f, temp_path = tempfile.mkstemp()
+    os.close(f)
+    try:
+        yield temp_path
+    finally:
+        if os.path.isfile(temp_path):
+            os.unlink(temp_path)
