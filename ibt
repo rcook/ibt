@@ -11,27 +11,33 @@
 
 import contextlib
 import fcntl
-import hashlib
 import os
-import re
 import shlex
-import shutil
-import subprocess
 import sys
-import yaml
 
-SCRIPT_FILE_NAME = "temp.sh"
+from ibtimpl.context import *
+from ibtimpl.destroy_command import *
+from ibtimpl.docker_util import *
+from ibtimpl.reup_command import *
+from ibtimpl.run_command import *
+from ibtimpl.script_command import *
+from ibtimpl.shell_command import *
+from ibtimpl.status_command import *
+from ibtimpl.up_command import *
 
-"""
-# See https://hg.python.org/cpython/file/3.4/Lib/shlex.py
-FIND_UNSAFE = re.compile(r'[^\w@%+=:,./-]').search
-def shell_quote(s):
-    if not s:
-        return "''"
-    if FIND_UNSAFE(s) is None:
-        return s
-    return "'" + s.replace("'", "'\"'\"'") + "'"
-"""
+COMMANDS = [
+    DestroyCommand(),
+    ReupCommand(),
+    RunCommand(),
+    ScriptCommand(),
+    ShellCommand(),
+    StatusCommand(),
+    UpCommand()
+]
+
+COMMAND_LOOKUP = {}
+for command in COMMANDS:
+    COMMAND_LOOKUP[command.name] = command
 
 @contextlib.contextmanager
 def try_acquire_lock(ctx):
@@ -45,299 +51,50 @@ def try_acquire_lock(ctx):
         except IOError:
             yield False
 
-def read_settings(ctx):
-    with open(ctx.ibt_file_name, "rt") as f:
-        return yaml.load(f)
-
-def call_process(command):
-    proc = subprocess.Popen(
-        command,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE)
-    proc.communicate()
-    return proc.returncode == 0
-
-def check_process(command):
-    proc = subprocess.Popen(
-        command,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE)
-    (out, error) = proc.communicate()
-    if proc.returncode != 0:
-        raise RuntimeError("Popen command failed: {}".format(error))
-    return out
-
-def user_info(dir):
-    return check_process(["stat", "-c", "%u:%G:%g:%U", dir]).strip().split(":")
-
 def resolve_local_path(ctx, path):
     return os.path.abspath(os.path.join(ctx.project_dir, path))
 
-def docker_installed():
-    try:
-        return call_process(["docker", "--version"])
-    except OSError:
-        return False
-
-def docker_image_exists(image_id):
-    return call_process(["docker", "inspect", image_id])
-
-def docker_image_build(image_id, project_dir):
-    if docker_image_exists(image_id):
-        print("Docker image {} already built".format(image_id))
-    else:
-        print("Building Docker image {}".format(image_id))
-        check_process(["docker", "build", "-t", image_id, project_dir])
-
-def docker_image_remove(image_id):
-    if docker_image_exists(image_id):
-        print("Destroying Docker image {}".format(image_id))
-        check_process(["docker", "rmi", image_id])
-    else:
-        print("No Docker image {} to destroy".format(image_id))
-
-def make_run_command(ctx, container_working_dir, args=None):
-    settings = read_settings(ctx)
-
-    additional_args = []
-
-    ports = settings.get("port", None)
-    if ports is not None:
-        for entry in ports:
-            additional_args.append("-p")
-            additional_args.append(entry)
-
-    volumes = settings.get("volumes", None)
-    if volumes is not None:
-        for key in volumes:
-            additional_args.append("-v")
-            local_dir = resolve_local_path(ctx, key)
-            container_dir = volumes[key]
-            additional_args.append("{}:{}".format(local_dir, container_dir))
-
-    (_, _, _, user_name) = user_info(ctx.project_dir)
-    front = [
-        "docker",
-        "run",
-        "-w",
-        container_working_dir,
-        "-u",
-        user_name,
-        "-v",
-        "{}:{}".format(ctx.project_dir, ctx.container_project_dir),
-        "--rm",
-        "-e",
-        "IBTPROJECTDIR={}".format(ctx.container_project_dir)
-    ] + additional_args
-    back = [ctx.image_id]
-
-    return front + back if args is None else front + args + back
-
-def docker_run(ctx, container_working_dir, container_run_path):
-    command = make_run_command(ctx, container_working_dir) + ["/bin/sh", container_run_path]
-    subprocess.check_call(command)
-    
-class Context(object):
-    def __init__(self, dir, ibt_file_name):
-        self._dir = dir
-        self._ibt_file_name = ibt_file_name
-        self._project_id = hashlib.md5(self._ibt_file_name).hexdigest()
-        self._image_id = "ibt-{}".format(self._project_id)
-        self._project_dir = os.path.dirname(self._ibt_file_name)
-        self._dot_dir = os.path.join(self._project_dir, ".ibt")
-        self._container_project_dir = "/{}".format(os.path.basename(self._project_dir))
-        self._container_dot_dir = os.path.join(self._container_project_dir, ".ibt")
-
-    @property
-    def ibt_file_name(self): return self._ibt_file_name
-
-    @property
-    def dir(self): return self._dir
-
-    @property
-    def project_id(self): return self._project_id
-
-    @property
-    def image_id(self): return self._image_id
-
-    @property
-    def project_dir(self): return self._project_dir
-
-    @property
-    def dot_dir(self): return self._dot_dir
-
-    @property
-    def container_project_dir(self): return self._container_project_dir
-
-    @property
-    def container_dot_dir(self): return self._container_dot_dir
-
-def do_destroy(ctx, args):
-    if len(args) > 0:
-        raise RuntimeError("destroy takes no arguments")
-
-    docker_image_remove(ctx.image_id)
-
-def do_reup(ctx, args):
-    do_destroy(ctx, args)
-    do_up(ctx, args)
-
-def do_run(ctx, args):
-    if len(args) == 0:
-        raise RuntimeError("run takes one or more arguments")
-
-    if not docker_image_exists(ctx.image_id):
-        raise RuntimeError("Project has not been upped")
-
-    rel_dir = os.path.relpath(ctx.dir, ctx.project_dir)
-    container_working_dir = os.path.join(ctx.container_project_dir, rel_dir)
-
-    local_run_path = os.path.join(ctx.dot_dir, SCRIPT_FILE_NAME)
-    container_run_path = os.path.join(ctx.container_dot_dir, SCRIPT_FILE_NAME)
-
-    with open(local_run_path, "wt") as f:
-        f.write("#!/bin/sh\n")
-        f.write(" ".join(args) + "\n")
-
-    docker_run(ctx, container_working_dir, container_run_path)
-
-def do_script(ctx, args):
-    if len(args) != 1:
-        raise RuntimeError("script takes one argument")
-
-    if not docker_image_exists(ctx.image_id):
-        raise RuntimeError("Project has not been upped")
-
-    rel_dir = os.path.relpath(ctx.dir, ctx.project_dir)
-    container_working_dir = os.path.join(ctx.container_project_dir, rel_dir)
-
-    local_run_path = os.path.join(ctx.dot_dir, SCRIPT_FILE_NAME)
-    container_run_path = os.path.join(ctx.container_dot_dir, SCRIPT_FILE_NAME)
-
-    shutil.copyfile(args[0], os.path.join(ctx.dot_dir, "script"))
-    container_script_path = os.path.join(ctx.container_dot_dir, "script")
-
-    with open(local_run_path, "wt") as f:
-        f.write("#!/bin/sh\n")
-        f.write("chmod +x {}\n".format(container_script_path))
-        f.write(container_script_path + "\n")
-
-    docker_run(ctx, container_working_dir, container_run_path)
-
-def do_shell(ctx, args):
-    if not docker_image_exists(ctx.image_id):
-        raise RuntimeError("Project has not been upped")
-
-    rel_dir = os.path.relpath(ctx.dir, ctx.project_dir)
-    container_working_dir = os.path.join(ctx.container_project_dir, rel_dir)
-
-    command = make_run_command(ctx, container_working_dir, ["-it"]) + args
-    subprocess.check_call(command)
-
-def do_status(ctx, args):
-    if len(args) > 0:
-        raise RuntimeError("status takes no arguments")
-
-    (uid, group_name, gid, user_name) = user_info(ctx.project_dir)
-
-    print("IBT: Isolated Build Tool\n")
-    print("Project information:")
-    print("  Project directory:   {}".format(ctx.project_dir))
-    print("  Working directory:   {}".format(ctx.dir))
-    print("  Project ID:          {}".format(ctx.project_id))
-    print("  Configuration file:  {}".format(ctx.ibt_file_name))
-    print("  Temporary directory: {}".format(ctx.dot_dir))
-    print("User information:")
-    print("  User:                {} ({})".format(user_name, uid))
-    print("  Group:               {} ({})".format(group_name, gid))
-    print("Docker container information:")
-    print("  Docker image ID:     {}".format(ctx.image_id))
-    print("  Project directory:   {}".format(ctx.container_project_dir))
-    print("  Temporary directory: {}".format(ctx.container_dot_dir))
-    print("IBT status:")
-    print("  Temporary directory: {}".format("exists" if os.path.isdir(ctx.dot_dir) else "does not exist"))
-    print("  Docker image:        {}".format("built" if docker_image_exists(ctx.image_id) else "not built"))
-
-    settings = read_settings(ctx)
-
-    volumes = settings.get("volumes", None)
-    if volumes is not None and len(volumes) > 0:
-        print("\nProject volumes:")
-        for key in sorted(volumes):
-            local_dir = resolve_local_path(ctx, key)
-            print("  {} = {}".format(local_dir, volumes[key]))
-
-    aliases = settings.get("aliases", None)
-    if aliases is not None and len(aliases) > 0:
-        print("\nProject aliases:")
-        for key in sorted(aliases):
-            print("  {} = {}".format(key, aliases[key]))
-
-    print("")
-
-def do_up(ctx, args):
-    if len(args) > 0:
-        raise RuntimeError("up takes no arguments")
-
-    settings = read_settings(ctx)
-
-    with open(os.path.join(ctx.dot_dir, ".dockerignore"), "wt") as f:
-        f.write("*\n")
-
-    (uid, group_name, gid, user_name) = user_info(ctx.project_dir)
-
-    with open(os.path.join(ctx.dot_dir, "Dockerfile"), "wt") as f:
-        f.write("FROM {}\n".format(settings["docker-image"]))
-        f.write("RUN groupadd -g {} {}\n".format(gid, group_name))
-        f.write("RUN useradd -u {} -g {} {}\n".format(uid, gid, user_name))
-
-    docker_image_build(ctx.image_id, ctx.dot_dir)
-
 def run_command(ctx, args):
-    command = args.pop(0)
-    if command == "destroy":
-        do_destroy(ctx, args)
-    elif command == "reup":
-        do_reup(ctx, args)
-    elif command == "run":
-        do_run(ctx, args)
-    elif command == "script":
-        do_script(ctx, args)
-    elif command == "shell":
-        do_shell(ctx, args)
-    elif command == "status":
-        do_status(ctx, args)
-    elif command == "up":
-        do_up(ctx, args)
-    else:
-        raise RuntimeError("Unsupported command {}".format(command))
+    name = args.pop(0)
+    command = COMMAND_LOOKUP.get(name, None)
+    if command is None:
+        raise RuntimeError("Unsupported command {}".format(name))
 
-def find_ibt_file(dir):
+    command.run(ctx, args)
+
+def find_config_file(dir):
     file_name = os.path.join(dir, "Ibtfile")
     if os.path.isfile(file_name):
         return file_name
     parent_dir = os.path.dirname(dir)
-    return None if parent_dir == dir else find_ibt_file(parent_dir)
+    return None if parent_dir == dir else find_config_file(parent_dir)
 
 def main_inner(ctx, args):
-    settings = read_settings(ctx)
-    aliases = settings.get("aliases", None)
+    aliases = ctx.settings.get("aliases", None)
+    has_aliases = aliases is not None and len(aliases) > 0
 
     if len(args) < 1:
         print("IBT: Isolated Build Tool\n")
-        print("Commands:\n"
-            "  destroy    Destroy project's Docker image\n"
-            "  reup       Equivalent to 'destroy' followed by 'up'\n"
-            "  run        Run command inside Docker container\n"
-            "  script     Run script inside Docker container\n"
-            "  shell      Run shell inside Docker container\n"
-            "  status     Show project status\n"
-            "  up         Create Docker image for project")
 
-        if aliases is not None and len(aliases) > 0:
+        max_name_len = 0
+        for name in COMMAND_LOOKUP:
+            if len(name) > max_name_len:
+                max_name_len = len(name)
+
+        if has_aliases:
+            for key in aliases:
+                if len(key) > max_name_len:
+                    max_name_len = len(key)
+
+        print("Commands:")
+        for name in sorted(COMMAND_LOOKUP):
+            command = COMMAND_LOOKUP[name]
+            print("  {}  {}".format(name.ljust(max_name_len), command.parser.description))
+
+        if has_aliases:
             print("\nProject aliases:")
             for key in sorted(aliases):
-                print("  {} = {}".format(key, aliases[key]))
+                print("  {}  {}".format(key.ljust(max_name_len), aliases[key]))
 
         print("")
         return
@@ -355,17 +112,17 @@ def main(dir, args):
         print("Please install Docker")
         return
 
-    ibt_file_name = find_ibt_file(dir)
-    if ibt_file_name is None:
-        print("No Ibtfile configuration file found")
+    config_path = find_config_file(dir)
+    if config_path is None:
+        print("No Ibtfile project configuration file could be found")
         return
 
-    ctx = Context(dir, ibt_file_name)
+    ctx = Context(dir, config_path)
 
     # Special-case the "status" command to report status even
     # if .ibt directory has not been created yet
     if not os.path.isdir(ctx.dot_dir) and args == ["status"]:
-        do_status(ctx, [])
+        StatusCommand().run(ctx, [])
         return
 
     with try_acquire_lock(ctx) as result:
