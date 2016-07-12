@@ -23,5 +23,5 @@ class DockerBuildCommand(Command):
             raise RuntimeError("Don't know how to build Docker image")
 
         with temp_file() as temp_path:
-            make_shell_script(temp_path, lines)
+            make_shell_script(temp_path, ["cd {}".format(ctx.project_dir)] + lines)
             subprocess.check_call(["/bin/sh", temp_path])
