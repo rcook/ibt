@@ -57,7 +57,8 @@ $ ln -sf $PWD/ibt/ibt $HOME/bin/ibt
 ## `Ibtfile` settings
 
 * `aliases`: (optional) one or more project-specific command aliases
-* `docker-image`: specifies base Docker image for project
+* `docker`: specifies base Docker image information for project including
+`image` and `build`
 * `ports`: (optional) one or more host:container port pairs to
 configure port forwarding
 * `volumes`: (optional) one or more additional volumes to mount inside

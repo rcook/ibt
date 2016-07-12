@@ -27,13 +27,22 @@ class StatusCommand(Command):
         print("  Project ID:          {}".format(ctx.project_id))
         print("  Configuration file:  {}".format(ctx.config_path))
         print("  Temporary directory: {}".format(ctx.dot_dir))
+
         print("User information:")
         print("  User:                {} ({})".format(user_name, uid))
         print("  Group:               {} ({})".format(group_name, gid))
+
         print("Docker container information:")
         print("  Docker image ID:     {}".format(ctx.image_id))
         print("  Project directory:   {}".format(ctx.container_project_dir))
         print("  Temporary directory: {}".format(ctx.container_dot_dir))
+        docker = ctx.settings.get("docker", None)
+        docker_image = None if docker is None else docker.get("image", None)
+        if docker is None:
+            print("  Docker base image:   not configured")
+        else:
+            print("  Docker base image:   {}".format(docker["image"]))
+
         print("IBT status:")
         print("  Temporary directory: {}".format("exists" if os.path.isdir(ctx.dot_dir) else "does not exist"))
         print("  Docker image:        {}".format("built" if docker_image_exists(ctx.image_id) else "not built"))

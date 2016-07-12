@@ -21,24 +21,35 @@ class UpCommand(Command):
         self.parser.add_argument("--docker-build", "-b", action="store_true", help="rebuild base image before creating project image")
 
     def run(self, ctx, args):
-        with open(os.path.join(ctx.dot_dir, ".dockerignore"), "wt") as f:
-            f.write("*\n")
-
-        (uid, group_name, gid, user_name) = user_info(ctx.project_dir)
-
-        with open(os.path.join(ctx.dot_dir, "Dockerfile"), "wt") as f:
-            f.write("FROM {}\n".format(ctx.settings["docker-image"]))
-            f.write("RUN groupadd -g {} {}\n".format(gid, group_name))
-            f.write("RUN useradd -u {} -g {} {}\n".format(uid, gid, user_name))
+        docker = ctx.settings.get("docker", None)
+        if docker is None:
+            docker_image = None
+            docker_build = None
+        else:
+            docker_image = docker.get("image", None)
+            docker_build = docker.get("build", None)
 
         if args.docker_build:
-            lines = ctx.settings.get("docker-build", None)
-            if lines is not None:
+            if docker_build is None:
+                raise RuntimeError("No build commands configured for Docker base image")
+            else:
                 with temp_file() as temp_path:
-                    make_shell_script(temp_path, ["cd {}".format(ctx.project_dir)] + lines)
+                    make_shell_script(temp_path, ["cd {}".format(ctx.project_dir)] + docker_build)
                     subprocess.check_call(["/bin/sh", temp_path])
+
+        if docker_image is None:
+            raise RuntimeError("No Docker base image is configured")
+        else:
+            uid, group_name, gid, user_name = user_info(ctx.project_dir)
+            with open(os.path.join(ctx.dot_dir, "Dockerfile"), "wt") as f:
+                f.write("FROM {}\n".format(docker_image))
+                f.write("RUN groupadd -g {} {}\n".format(gid, group_name))
+                f.write("RUN useradd -u {} -g {} {}\n".format(uid, gid, user_name))
 
         if args.destroy:
             docker_image_remove(ctx.image_id)
+
+        with open(os.path.join(ctx.dot_dir, ".dockerignore"), "wt") as f:
+            f.write("*\n")
 
         docker_image_build(ctx.image_id, ctx.dot_dir)
