@@ -20,6 +20,11 @@ from ibtimpl.docker_util import *
 from ibtimpl.help_command import *
 from ibtimpl.status_command import *
 
+HELP_COMMAND = HelpCommand()
+
+def show_usage(ctx):
+    HELP_COMMAND.run(ctx, [])
+
 @contextlib.contextmanager
 def try_acquire_lock(ctx):
     if not os.path.isdir(ctx.dot_dir):
@@ -39,7 +44,9 @@ def run_command(ctx, argv):
     name = argv[0]
     command = get_commands().get(name, None)
     if command is None:
-        raise RuntimeError("Unsupported command {}".format(name))
+        print("Unrecognized command \"{}\"!\n".format(name))
+        show_usage(ctx)
+        return
 
     args = command.parser.parse_args(argv[1 : ])
     command.run(ctx, args)
@@ -53,7 +60,7 @@ def find_config_file(dir):
 
 def main_inner(ctx, argv):
     if len(argv) < 2:
-        HelpCommand().run(ctx, [])
+        show_usage(ctx)
         return
 
     command = argv[1]
