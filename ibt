@@ -39,9 +39,6 @@ def try_acquire_lock(ctx):
         except IOError:
             yield False
 
-def resolve_local_path(ctx, path):
-    return os.path.abspath(os.path.join(ctx.project_dir, path))
-
 def run_command(ctx, argv):
     name = argv[0]
     command = get_commands().get(name, None)

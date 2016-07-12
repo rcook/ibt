@@ -53,3 +53,6 @@ class Context(object):
             with open(self._config_path, "rt") as f:
                 self._settings = yaml.load(f)
         return self._settings
+
+    def resolve_local_path(self, path):
+        return os.path.abspath(os.path.join(self._project_dir, path))

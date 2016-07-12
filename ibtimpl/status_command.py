@@ -42,7 +42,7 @@ class StatusCommand(Command):
         if volumes is not None and len(volumes) > 0:
             print("\nProject volumes:")
             for key in sorted(volumes):
-                local_dir = resolve_local_path(ctx, key)
+                local_dir = ctx.resolve_local_path(key)
                 print("  {} = {}".format(local_dir, volumes[key]))
 
         aliases = ctx.settings.get("aliases", None)

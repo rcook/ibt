@@ -45,7 +45,7 @@ def make_run_command(ctx, container_working_dir, args=None):
     if volumes is not None:
         for key in volumes:
             additional_args.append("-v")
-            local_dir = resolve_local_path(ctx, key)
+            local_dir = ctx.resolve_local_path(key)
             container_dir = volumes[key]
             additional_args.append("{}:{}".format(local_dir, container_dir))
 
