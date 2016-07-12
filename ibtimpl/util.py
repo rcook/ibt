@@ -6,7 +6,6 @@ def get_commands():
     if get_commands.commands is None:
         from ibtimpl.destroy_command import DestroyCommand
         from ibtimpl.help_command import HelpCommand
-        from ibtimpl.reup_command import ReupCommand
         from ibtimpl.run_command import RunCommand
         from ibtimpl.script_command import ScriptCommand
         from ibtimpl.shell_command import ShellCommand
@@ -16,7 +15,6 @@ def get_commands():
         commands = [
             DestroyCommand(),
             HelpCommand(),
-            ReupCommand(),
             RunCommand(),
             ScriptCommand(),
             ShellCommand(),

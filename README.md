@@ -46,6 +46,7 @@ $ ln -sf $PWD/ibt/ibt $HOME/bin/ibt
 ## Standard commands
 
 * `destroy`: destroys the project's Docker image
+* `help`: display help
 * `run`: runs a command inside a Docker container
 * `script`: runs a script inside a Docker container
 * `shell`: runs an interactive shell inside a Docker container

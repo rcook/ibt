@@ -8,14 +8,9 @@ from ibtimpl.util import *
 class UpCommand(Command):
     def __init__(self):
         super(UpCommand, self).__init__("up", "Create project image")
+        self.parser.add_argument("--force", "-f", action="store_true", help="destroy and recreate project image")
 
     def run(self, ctx, args):
-        if len(args) > 0:
-            raise RuntimeError("up takes no arguments")
-
-        self.run_helper(ctx)
-
-    def run_helper(self, ctx):
         with open(os.path.join(ctx.dot_dir, ".dockerignore"), "wt") as f:
             f.write("*\n")
 
@@ -26,4 +21,6 @@ class UpCommand(Command):
             f.write("RUN groupadd -g {} {}\n".format(gid, group_name))
             f.write("RUN useradd -u {} -g {} {}\n".format(uid, gid, user_name))
 
+        if args.force:
+            docker_image_remove(ctx.image_id)
         docker_image_build(ctx.image_id, ctx.dot_dir)

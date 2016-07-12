@@ -17,10 +17,4 @@ class DestroyCommand(Command):
         super(DestroyCommand, self).__init__("destroy", "Destroy project image")
 
     def run(self, ctx, args):
-        if len(args) > 0:
-            raise RuntimeError("destroy takes no arguments")
-
-        self.run_helper(ctx)
-
-    def run_helper(self, ctx):
         docker_image_remove(ctx.image_id)
