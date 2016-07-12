@@ -16,11 +16,10 @@ from ibtimpl.docker_util import *
 class RunCommand(Command):
     def __init__(self):
         super(RunCommand, self).__init__("run", "Run command inside container")
+        self.parser.add_argument("command", metavar="COMMAND", help="command")
+        self.parser.add_argument("args", metavar="ARGS", nargs=argparse.REMAINDER, help="arguments")
 
     def run(self, ctx, args):
-        if len(args) == 0:
-            raise RuntimeError("run takes one or more arguments")
-
         if not docker_image_exists(ctx.image_id):
             raise RuntimeError("Project has not been upped")
 
@@ -32,6 +31,6 @@ class RunCommand(Command):
 
         with open(local_run_path, "wt") as f:
             f.write("#!/bin/sh\n")
-            f.write(" ".join(args) + "\n")
+            f.write(" ".join([args.command] + args.args) + "\n")
 
         docker_run(ctx, container_working_dir, container_run_path)

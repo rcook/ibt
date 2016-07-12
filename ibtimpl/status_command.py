@@ -18,9 +18,6 @@ class StatusCommand(Command):
         super(StatusCommand, self).__init__("status", "Show project status")
 
     def run(self, ctx, args):
-        if len(args) > 0:
-            raise RuntimeError("status takes no arguments")
-
         (uid, group_name, gid, user_name) = user_info(ctx.project_dir)
 
         print("IBT: Isolated Build Tool\n")

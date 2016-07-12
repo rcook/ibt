@@ -16,28 +16,9 @@ import shlex
 import sys
 
 from ibtimpl.context import *
-from ibtimpl.destroy_command import *
 from ibtimpl.docker_util import *
-from ibtimpl.reup_command import *
-from ibtimpl.run_command import *
-from ibtimpl.script_command import *
-from ibtimpl.shell_command import *
+from ibtimpl.help_command import *
 from ibtimpl.status_command import *
-from ibtimpl.up_command import *
-
-COMMANDS = [
-    DestroyCommand(),
-    ReupCommand(),
-    RunCommand(),
-    ScriptCommand(),
-    ShellCommand(),
-    StatusCommand(),
-    UpCommand()
-]
-
-COMMAND_LOOKUP = {}
-for command in COMMANDS:
-    COMMAND_LOOKUP[command.name] = command
 
 @contextlib.contextmanager
 def try_acquire_lock(ctx):
@@ -54,12 +35,13 @@ def try_acquire_lock(ctx):
 def resolve_local_path(ctx, path):
     return os.path.abspath(os.path.join(ctx.project_dir, path))
 
-def run_command(ctx, args):
-    name = args.pop(0)
-    command = COMMAND_LOOKUP.get(name, None)
+def run_command(ctx, argv):
+    name = argv[0]
+    command = get_commands().get(name, None)
     if command is None:
         raise RuntimeError("Unsupported command {}".format(name))
 
+    args = command.parser.parse_args(argv[1 : ])
     command.run(ctx, args)
 
 def find_config_file(dir):
@@ -69,45 +51,19 @@ def find_config_file(dir):
     parent_dir = os.path.dirname(dir)
     return None if parent_dir == dir else find_config_file(parent_dir)
 
-def main_inner(ctx, args):
-    aliases = ctx.settings.get("aliases", None)
-    has_aliases = aliases is not None and len(aliases) > 0
-
-    if len(args) < 1:
-        print("IBT: Isolated Build Tool\n")
-
-        max_name_len = 0
-        for name in COMMAND_LOOKUP:
-            if len(name) > max_name_len:
-                max_name_len = len(name)
-
-        if has_aliases:
-            for key in aliases:
-                if len(key) > max_name_len:
-                    max_name_len = len(key)
-
-        print("Commands:")
-        for name in sorted(COMMAND_LOOKUP):
-            command = COMMAND_LOOKUP[name]
-            print("  {}  {}".format(name.ljust(max_name_len), command.parser.description))
-
-        if has_aliases:
-            print("\nProject aliases:")
-            for key in sorted(aliases):
-                print("  {}  {}".format(key.ljust(max_name_len), aliases[key]))
-
-        print("")
+def main_inner(ctx, argv):
+    if len(argv) < 2:
+        HelpCommand().run(ctx, [])
         return
 
-    command = args[0]
+    command = argv[1]
+    aliases = ctx.settings.get("aliases", None)
     if command in aliases:
         run_command(ctx, shlex.split(aliases[command]))
     else:
-        run_command(ctx, args)
+        run_command(ctx, argv[1 : ])
 
-def main(dir, args):
-    args.pop(0)
-
+def main(dir, argv):
     if not docker_installed():
         print("Please install Docker")
         return
@@ -121,15 +77,15 @@ def main(dir, args):
 
     # Special-case the "status" command to report status even
     # if .ibt directory has not been created yet
-    if not os.path.isdir(ctx.dot_dir) and args == ["status"]:
+    if not os.path.isdir(ctx.dot_dir) and argv[1 : ] == ["status"]:
         StatusCommand().run(ctx, [])
         return
 
     with try_acquire_lock(ctx) as result:
         if result:
-            main_inner(ctx, args)
+            main_inner(ctx, argv)
         else:
             print("Another instance of ibt is already running")
 
 if __name__ == "__main__":
-    main(os.getcwd(), list(sys.argv))
+    main(os.getcwd(), sys.argv)

@@ -15,6 +15,8 @@ from ibtimpl.docker_util import *
 class ShellCommand(Command):
     def __init__(self):
         super(ShellCommand, self).__init__("shell", "Run shell inside container")
+        self.parser.add_argument("command", metavar="COMMAND", nargs="?", help="command")
+        self.parser.add_argument("args", metavar="ARGS", nargs=argparse.REMAINDER, help="arguments")
 
     def run(self, ctx, args):
         if not docker_image_exists(ctx.image_id):
@@ -23,5 +25,6 @@ class ShellCommand(Command):
         rel_dir = os.path.relpath(ctx.dir, ctx.project_dir)
         container_working_dir = os.path.join(ctx.container_project_dir, rel_dir)
 
-        command = make_run_command(ctx, container_working_dir, ["-it"]) + args
+        user_command = args.args if args.command is None else [args.command] + args.args
+        command = make_run_command(ctx, container_working_dir, ["-it"]) + user_command
         subprocess.check_call(command)

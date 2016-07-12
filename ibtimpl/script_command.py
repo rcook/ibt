@@ -17,11 +17,9 @@ from ibtimpl.docker_util import *
 class ScriptCommand(Command):
     def __init__(self):
         super(ScriptCommand, self).__init__("script", "Run script inside container")
+        self.parser.add_argument("script_path", metavar="SCRIPTPATH", help="script to run")
 
     def run(self, ctx, args):
-        if len(args) != 1:
-            raise RuntimeError("script takes one argument")
-
         if not docker_image_exists(ctx.image_id):
             raise RuntimeError("Project has not been upped")
 
@@ -31,7 +29,7 @@ class ScriptCommand(Command):
         local_run_path = os.path.join(ctx.dot_dir, SCRIPT_FILE_NAME)
         container_run_path = os.path.join(ctx.container_dot_dir, SCRIPT_FILE_NAME)
 
-        shutil.copyfile(args[0], os.path.join(ctx.dot_dir, "script"))
+        shutil.copyfile(args.script_path, os.path.join(ctx.dot_dir, "script"))
         container_script_path = os.path.join(ctx.container_dot_dir, "script")
 
         with open(local_run_path, "wt") as f:
