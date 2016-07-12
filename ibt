@@ -18,9 +18,11 @@ import sys
 from ibtimpl.context import *
 from ibtimpl.docker_util import *
 from ibtimpl.help_command import *
+from ibtimpl.run_command import *
 from ibtimpl.status_command import *
 
 HELP_COMMAND = HelpCommand()
+RUN_COMMAND = RunCommand()
 
 def show_usage(ctx):
     HELP_COMMAND.run(ctx, [])
@@ -63,12 +65,15 @@ def main_inner(ctx, argv):
         show_usage(ctx)
         return
 
-    command = argv[1]
+    name = argv[1]
     aliases = ctx.settings.get("aliases", None)
-    if command in aliases:
-        run_command(ctx, shlex.split(aliases[command]))
-    else:
+    alias = None if aliases is None else aliases.get(name, None)
+    if alias is None:
         run_command(ctx, argv[1 : ])
+    elif isinstance(alias, list):
+        RUN_COMMAND.run_lines(ctx, alias)
+    else:
+        run_command(ctx, shlex.split(alias))
 
 def main(dir, argv):
     if not docker_installed():

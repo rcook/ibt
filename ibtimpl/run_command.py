@@ -23,6 +23,9 @@ class RunCommand(Command):
         if not docker_image_exists(ctx.image_id):
             raise RuntimeError("Project has not been upped")
 
+        self.run_lines(ctx, [" ".join([args.command] + args.args)])
+
+    def run_lines(self, ctx, lines):
         rel_dir = os.path.relpath(ctx.dir, ctx.project_dir)
         container_working_dir = os.path.join(ctx.container_project_dir, rel_dir)
 
@@ -31,6 +34,7 @@ class RunCommand(Command):
 
         with open(local_run_path, "wt") as f:
             f.write("#!/bin/sh\n")
-            f.write(" ".join([args.command] + args.args) + "\n")
+            for line in lines:
+                f.write(line + "\n")
 
         docker_run(ctx, container_working_dir, container_run_path)
