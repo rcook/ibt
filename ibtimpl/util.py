@@ -1,9 +1,8 @@
 import contextlib
 import os
+import shutil
 import subprocess
 import tempfile
-
-SCRIPT_FILE_NAME = "temp.sh"
 
 def get_commands():
     if get_commands.commands is None:
@@ -59,11 +58,30 @@ def make_shell_script(path, lines):
             f.write(line + "\n")
 
 @contextlib.contextmanager
-def temp_file():
-    f, temp_path = tempfile.mkstemp()
+def temp_file(dir=None):
+    f, temp_path = tempfile.mkstemp(dir=dir)
     os.close(f)
     try:
         yield temp_path
     finally:
         if os.path.isfile(temp_path):
             os.unlink(temp_path)
+
+@contextlib.contextmanager
+def temp_dir(dir=None):
+    should_create_dir = dir is not None and not os.path.isdir(dir)
+    if should_create_dir:
+        os.makedirs(dir)
+
+    temp_path = tempfile.mkdtemp(dir=dir)
+    try:
+        yield temp_path
+    finally:
+        if os.path.isdir(temp_path):
+            shutil.rmtree(temp_path)
+
+            if should_create_dir:
+                try:
+                    os.removedirs(dir)
+                except OSError:
+                    pass

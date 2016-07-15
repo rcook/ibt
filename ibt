@@ -9,8 +9,6 @@
 #
 ###############################################################################
 
-import contextlib
-import fcntl
 import os
 import shlex
 import sys
@@ -26,18 +24,6 @@ RUN_COMMAND = RunCommand()
 
 def show_usage(ctx):
     HELP_COMMAND.run(ctx, [])
-
-@contextlib.contextmanager
-def try_acquire_lock(ctx):
-    if not os.path.isdir(ctx.dot_dir):
-        os.makedirs(ctx.dot_dir)
-
-    with open(os.path.join(ctx.dot_dir, "lock"), "w") as f:
-        try:
-            fcntl.lockf(f, fcntl.LOCK_EX | fcntl.LOCK_NB)
-            yield True
-        except IOError:
-            yield False
 
 def run_command(ctx, argv):
     name = argv[0]
@@ -90,11 +76,7 @@ def main(dir, argv):
         StatusCommand().run(ctx, [])
         return
 
-    with try_acquire_lock(ctx) as result:
-        if result:
-            main_inner(ctx, argv)
-        else:
-            print("Another instance of ibt is already running")
+    main_inner(ctx, argv)
 
 if __name__ == "__main__":
     main(os.getcwd(), sys.argv)

@@ -30,8 +30,8 @@ class RunCommand(Command):
         rel_dir = os.path.relpath(ctx.dir, ctx.project_dir)
         container_working_dir = os.path.join(ctx.container_project_dir, rel_dir)
 
-        local_run_path = os.path.join(ctx.dot_dir, SCRIPT_FILE_NAME)
-        container_run_path = os.path.join(ctx.container_dot_dir, SCRIPT_FILE_NAME)
-
-        make_shell_script(local_run_path, lines)
-        docker_run(ctx, container_working_dir, container_run_path)
+        with temp_dir(ctx.dot_dir) as dir:
+            local_path = os.path.join(dir, "script")
+            container_path = os.path.join(ctx.container_dot_dir, os.path.relpath(local_path, ctx.dot_dir))
+            make_shell_script(local_path, lines)
+            docker_run(ctx, container_working_dir, container_path)

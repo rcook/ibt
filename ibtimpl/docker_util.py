@@ -18,12 +18,12 @@ def docker_installed():
 def docker_image_exists(image_id):
     return call_process(["docker", "inspect", image_id])
 
-def docker_image_build(image_id, project_dir):
+def docker_image_build(image_id, context_dir):
     if docker_image_exists(image_id):
         print("Docker image {} already built".format(image_id))
     else:
         print("Building Docker image {}".format(image_id))
-        check_process(["docker", "build", "-t", image_id, project_dir])
+        check_process(["docker", "build", "-t", image_id, context_dir])
 
 def docker_image_remove(image_id):
     if docker_image_exists(image_id):

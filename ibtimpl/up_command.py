@@ -37,19 +37,20 @@ class UpCommand(Command):
                     make_shell_script(temp_path, ["cd {}".format(ctx.project_dir)] + docker_build)
                     subprocess.check_call(["/bin/sh", temp_path])
 
-        if docker_image is None:
-            raise RuntimeError("No Docker base image is configured")
-        else:
-            uid, group_name, gid, user_name = user_info(ctx.project_dir)
-            with open(os.path.join(ctx.dot_dir, "Dockerfile"), "wt") as f:
-                f.write("FROM {}\n".format(docker_image))
-                f.write("RUN groupadd -g {} {}\n".format(gid, group_name))
-                f.write("RUN useradd -u {} -g {} {}\n".format(uid, gid, user_name))
-
         if args.destroy:
             docker_image_remove(ctx.image_id)
 
-        with open(os.path.join(ctx.dot_dir, ".dockerignore"), "wt") as f:
-            f.write("*\n")
+        with temp_dir() as dir:
+            if docker_image is None:
+                raise RuntimeError("No Docker base image is configured")
+            else:
+                uid, group_name, gid, user_name = user_info(ctx.project_dir)
+                with open(os.path.join(dir, "Dockerfile"), "wt") as f:
+                    f.write("FROM {}\n".format(docker_image))
+                    f.write("RUN groupadd -g {} {}\n".format(gid, group_name))
+                    f.write("RUN useradd -u {} -g {} {}\n".format(uid, gid, user_name))
 
-        docker_image_build(ctx.image_id, ctx.dot_dir)
+            with open(os.path.join(dir, ".dockerignore"), "wt") as f:
+                f.write("*\n")
+
+            docker_image_build(ctx.image_id, dir)
