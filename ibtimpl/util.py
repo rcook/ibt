@@ -48,9 +48,6 @@ def check_process(command):
         raise RuntimeError("Popen command failed: {}".format(error))
     return out
 
-def user_info(dir):
-    return check_process(["stat", "-c", "%u:%G:%g:%U", dir]).strip().split(":")
-
 def make_shell_script(path, lines):
     with open(path, "wt") as f:
         f.write("#!/bin/sh\n")

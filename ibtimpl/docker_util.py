@@ -49,7 +49,7 @@ def make_run_command(ctx, container_working_dir, args=None):
             container_dir = volumes[key]
             additional_args.append("{}:{}".format(local_dir, container_dir))
 
-    (_, _, _, user_name) = user_info(ctx.project_dir)
+    _, _, _, user_name = ctx.user_info()
     front = [
         "docker",
         "run",
@@ -58,7 +58,9 @@ def make_run_command(ctx, container_working_dir, args=None):
         "-u",
         user_name,
         "-v",
-        "{}:{}".format(ctx.project_dir, ctx.container_project_dir),
+        "{}:{}".format(ctx.project_info.dir, ctx.container_project_dir),
+        "-v",
+        "{}:{}".format(ctx.dot_dir, ctx.container_dot_dir),
         "--rm",
         "-e",
         "IBTPROJECTDIR={}".format(ctx.container_project_dir)

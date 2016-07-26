@@ -27,7 +27,7 @@ class RunCommand(Command):
         self.run_lines(ctx, [" ".join([args.command] + args.args)])
 
     def run_lines(self, ctx, lines):
-        rel_dir = os.path.relpath(ctx.dir, ctx.project_dir)
+        rel_dir = os.path.relpath(ctx.dir, ctx.project_info.dir)
         container_working_dir = os.path.join(ctx.container_project_dir, rel_dir)
 
         with temp_dir(ctx.dot_dir) as dir:

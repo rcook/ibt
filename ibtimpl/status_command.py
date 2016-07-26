@@ -18,14 +18,14 @@ class StatusCommand(Command):
         super(StatusCommand, self).__init__("status", "Show project status")
 
     def run(self, ctx, args):
-        (uid, group_name, gid, user_name) = user_info(ctx.project_dir)
+        uid, group_name, gid, user_name = ctx.user_info()
 
         print("IBT: Isolated Build Tool\n")
         print("Project information:")
-        print("  Project directory:   {}".format(ctx.project_dir))
+        print("  Project directory:   {}".format(ctx.project_info.dir))
         print("  Working directory:   {}".format(ctx.dir))
         print("  Project ID:          {}".format(ctx.project_id))
-        print("  Configuration file:  {}".format(ctx.config_path))
+        print("  Configuration file:  {}".format(ctx.project_info.config_path))
         print("  Temporary directory: {}".format(ctx.dot_dir))
 
         print("User information:")

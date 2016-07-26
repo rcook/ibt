@@ -34,7 +34,7 @@ class UpCommand(Command):
                 raise RuntimeError("No build commands configured for Docker base image")
             else:
                 with temp_file() as temp_path:
-                    make_shell_script(temp_path, ["cd {}".format(ctx.project_dir)] + docker_build)
+                    make_shell_script(temp_path, ["cd {}".format(ctx.project_info.dir)] + docker_build)
                     subprocess.check_call(["/bin/sh", temp_path])
 
         if args.destroy:
@@ -44,7 +44,7 @@ class UpCommand(Command):
             if docker_image is None:
                 raise RuntimeError("No Docker base image is configured")
             else:
-                uid, group_name, gid, user_name = user_info(ctx.project_dir)
+                uid, group_name, gid, user_name = ctx.user_info()
                 with open(os.path.join(dir, "Dockerfile"), "wt") as f:
                     f.write("FROM {}\n".format(docker_image))
                     f.write("RUN groupadd -g {} {}\n".format(gid, group_name))

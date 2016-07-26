@@ -16,6 +16,7 @@ import sys
 from ibtimpl.context import *
 from ibtimpl.docker_util import *
 from ibtimpl.help_command import *
+from ibtimpl.project_info import *
 from ibtimpl.run_command import *
 from ibtimpl.status_command import *
 
@@ -35,13 +36,6 @@ def run_command(ctx, argv):
 
     args = command.parser.parse_args(argv[1 : ])
     command.run(ctx, args)
-
-def find_config_file(dir):
-    file_name = os.path.join(dir, "Ibtfile")
-    if os.path.isfile(file_name):
-        return file_name
-    parent_dir = os.path.dirname(dir)
-    return None if parent_dir == dir else find_config_file(parent_dir)
 
 def main_inner(ctx, argv):
     if len(argv) < 2:
@@ -63,12 +57,12 @@ def main(dir, argv):
         print("Please install Docker")
         return
 
-    config_path = find_config_file(dir)
-    if config_path is None:
+    project_info = ProjectInfo.read(dir)
+    if project_info is None:
         print("No Ibtfile project configuration file could be found")
         return
 
-    ctx = Context(dir, config_path)
+    ctx = Context(project_info, dir)
 
     # Special-case the "status" command to report status even
     # if .ibt directory has not been created yet
