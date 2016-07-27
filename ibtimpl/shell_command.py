@@ -10,7 +10,9 @@
 import os
 
 from ibtimpl.command import *
+from ibtimpl.container_util import *
 from ibtimpl.docker_util import *
+from ibtimpl.util import *
 
 class ShellCommand(Command):
     def __init__(self):
@@ -26,5 +28,4 @@ class ShellCommand(Command):
         container_working_dir = os.path.join(ctx.container_project_dir, rel_dir)
 
         user_command = args.args if args.command is None else [args.command] + args.args
-        command = make_run_command(ctx, container_working_dir, ["-it"]) + user_command
-        subprocess.check_call(command)
+        run_in_container(ctx, container_working_dir, ["-it"], user_command)

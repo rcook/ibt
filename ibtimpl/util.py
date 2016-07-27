@@ -64,21 +64,37 @@ def temp_file(dir=None):
         if os.path.isfile(temp_path):
             os.unlink(temp_path)
 
+def flatten(*args):
+    output = []
+    for arg in args:
+        if hasattr(arg, "__iter__"):
+            output.extend(flatten(*arg))
+        else:
+            output.append(arg)
+    return output
+
+@contextlib.contextmanager
+def ensure_dirs(*dirs):
+    try:
+        cleanup_dirs = []
+        for dir in flatten(dirs):
+            if dir is not None and not os.path.isdir(dir):
+                cleanup_dirs.append(dir)
+                os.makedirs(dir)
+        yield
+    finally:
+        for dir in cleanup_dirs:
+            try:
+                os.removedirs(dir)
+            except OSError:
+                pass
+
 @contextlib.contextmanager
 def temp_dir(dir=None):
-    should_create_dir = dir is not None and not os.path.isdir(dir)
-    if should_create_dir:
-        os.makedirs(dir)
-
-    temp_path = tempfile.mkdtemp(dir=dir)
-    try:
-        yield temp_path
-    finally:
-        if os.path.isdir(temp_path):
-            shutil.rmtree(temp_path)
-
-            if should_create_dir:
-                try:
-                    os.removedirs(dir)
-                except OSError:
-                    pass
+    with ensure_dirs(dir):
+        temp_path = tempfile.mkdtemp(dir=dir)
+        try:
+            yield temp_path
+        finally:
+            if os.path.isdir(temp_path):
+                shutil.rmtree(temp_path)

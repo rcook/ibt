@@ -7,6 +7,7 @@
 #
 ###############################################################################
 
+from ibtimpl.container_util import *
 from ibtimpl.util import *
 
 def docker_installed():
@@ -32,43 +33,5 @@ def docker_image_remove(image_id):
     else:
         print("No Docker image {} to destroy".format(image_id))
 
-def make_run_command(ctx, container_working_dir, args=None):
-    additional_args = []
-
-    ports = ctx.settings.get("port", None)
-    if ports is not None:
-        for entry in ports:
-            additional_args.append("-p")
-            additional_args.append(entry)
-
-    volumes = ctx.settings.get("volumes", None)
-    if volumes is not None:
-        for key in volumes:
-            additional_args.append("-v")
-            local_dir = ctx.resolve_local_path(key)
-            container_dir = volumes[key]
-            additional_args.append("{}:{}".format(local_dir, container_dir))
-
-    _, _, _, user_name = ctx.user_info()
-    front = [
-        "docker",
-        "run",
-        "-w",
-        container_working_dir,
-        "-u",
-        user_name,
-        "-v",
-        "{}:{}".format(ctx.project_info.dir, ctx.container_project_dir),
-        "-v",
-        "{}:{}".format(ctx.dot_dir, ctx.container_dot_dir),
-        "--rm",
-        "-e",
-        "IBTPROJECTDIR={}".format(ctx.container_project_dir)
-    ] + additional_args
-    back = [ctx.image_id]
-
-    return front + back if args is None else front + args + back
-
 def docker_run(ctx, container_working_dir, container_run_path):
-    command = make_run_command(ctx, container_working_dir) + ["/bin/sh", container_run_path]
-    subprocess.check_call(command)
+    run_in_container(ctx, container_working_dir, None, ["/bin/sh", container_run_path])
