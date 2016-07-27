@@ -66,7 +66,7 @@ source tree.
 * `aliases`: (optional) one or more project-specific command aliases
 * `docker`: specifies base Docker image information for project including
 `image` and `build`
-* `ports`: (optional) one or more host:container port pairs to
+* `ports`: (optional) one or more host port-container port pairs to
 configure port forwarding
 * `volumes`: (optional) one or more additional volumes to mount inside
 container

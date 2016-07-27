@@ -7,7 +7,7 @@ docker:
   - make build
 
 ports:
-- 8080:8080
+  "8080": "8080"
 
 aliases:
   cmake: run 'cd $IBTPROJECTDIR && mkdir -p build && cd build && cmake -DCMAKE_BUILD_TYPE=Debug ..'

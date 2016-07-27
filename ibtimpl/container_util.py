@@ -14,11 +14,16 @@ from ibtimpl.util import *
 def run_in_container(ctx, container_working_dir, args=None, subcommand=None):
     additional_args = []
 
-    ports = ctx.settings.get("port", None)
-    if ports is not None:
-        for entry in ports:
-            additional_args.append("-p")
-            additional_args.append(entry)
+    ports = {}
+
+    ports_setting = ctx.settings.get("ports", None)
+    if ports_setting is not None:
+        for key in ports_setting:
+            host_port = key
+            container_port = ports_setting[key]
+            if host_port in ports:
+                raise RuntimeError("Duplicate host port {}".format(host_port))
+            ports[host_port] = container_port
 
     volumes = {
         ctx.project_info.dir: ctx.container_project_dir,
@@ -47,6 +52,7 @@ def run_in_container(ctx, container_working_dir, args=None, subcommand=None):
         "-e",
         "IBTPROJECTDIR={}".format(ctx.container_project_dir)
     ] + \
+        sum([["-p", "{}:{}".format(key, ports[key])] for key in ports], []) + \
         sum([["-v", "{}:{}".format(key, volumes[key])] for key in volumes], []) + \
         additional_args + \
         ([] if args is None else args) + \
