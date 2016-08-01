@@ -11,7 +11,7 @@ import os
 
 from ibtimpl.util import *
 
-def run_in_container(ctx, container_working_dir, args=None, subcommand=None):
+def _build_command(ctx, container_working_dir, args, subcommand):
     additional_args = []
 
     ports = {}
@@ -59,5 +59,14 @@ def run_in_container(ctx, container_working_dir, args=None, subcommand=None):
         [ctx.image_id] + \
         ([] if subcommand is None else subcommand)
 
+    return command, volumes
+
+def check_process_in_container(ctx, container_working_dir, args=None, subcommand=None):
+    command, volumes = _build_command(ctx, container_working_dir, args, subcommand)
     with ensure_dirs(volumes.keys()):
         subprocess.check_call(command)
+
+def call_process_in_container(ctx, container_working_dir, args=None, subcommand=None):
+    command, volumes = _build_command(ctx, container_working_dir, args, subcommand)
+    with ensure_dirs(volumes.keys()):
+        return subprocess.call(command)
