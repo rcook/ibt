@@ -15,7 +15,8 @@ class HelpCommand(Command):
         super(HelpCommand, self).__init__("help", "Display summary of standard commands")
 
     def run(self, ctx, args):
-        print("IBT: Isolated Build Tool\n")
+        print("IBT: Isolated Build Tool")
+        print("https://github.com/rcook/ibt\n")
 
         commands = get_commands()
         aliases = ctx.settings.get("aliases", None)

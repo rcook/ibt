@@ -1,7 +1,7 @@
 # IBT: Isolated Build Tool
 
-Simple Python wrapper script around [Docker][docker] for fully isolated build
-environments
+Project- and build-oriented tool for working with [Docker][docker] images and
+containers
 
 ## What's the point of this tool?
 
@@ -41,6 +41,13 @@ script into a directory on your search path. These instructions assume that the
 ```bash
 $ git clone https://github.com/rcook/ibt.git
 $ ln -sf $PWD/ibt/ibt $HOME/bin/ibt
+```
+
+You may need to install [pip][pip] and the YAML package as follows:
+
+```bash
+$ python get-pip.py --user
+$ pip install --user pyyaml
 ```
 
 ## Standard commands
@@ -174,5 +181,6 @@ Released under MIT License
 Copyright &copy; 2016, Richard Cook. All rights reserved.
 
 [docker]: https://www.docker.com/
+[pip]: https://pip.pypa.io/en/stable/installing/
 [python]: https://www.python.org/downloads/
 [vagrant]: https://www.vagrantup.com/

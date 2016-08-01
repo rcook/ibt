@@ -20,7 +20,8 @@ class StatusCommand(Command):
     def run(self, ctx, args):
         uid, group_name, gid, user_name = ctx.user_info()
 
-        print("IBT: Isolated Build Tool\n")
+        print("IBT: Isolated Build Tool")
+        print("https://github.com/rcook/ibt\n")
         print("Project information:")
         print("  Project directory:   {}".format(ctx.project_info.dir))
         print("  Working directory:   {}".format(ctx.dir))
