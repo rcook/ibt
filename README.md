@@ -53,13 +53,13 @@ $ pip install --user pyyaml
 ## Standard commands
 
 * `destroy`: destroys the project's Docker image
-* `dockerbuild`: build Docker image if `docker-build` setting is provided
 * `help`: display help
 * `run`: runs a command inside a Docker container
 * `script`: runs a script inside a Docker container
 * `shell`: runs an interactive shell inside a Docker container
 * `status`: shows project status
-* `up`: creates Docker image for the project
+* `up`: creates Docker image for the project after optionally building base
+Docker image
 
 ## `Ibtfile` settings
 
