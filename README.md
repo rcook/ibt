@@ -65,8 +65,8 @@ $ pip install --user pyyaml
 
 Configuration for any given project is driven by the contents of the `Ibtfile`
 settings file which should be placed in the root directory of the project.
-Alternatively, an `.ibtprojects` file place in the user's home directory can be
-used to specify the location of the `Ibtfile` for zero or more project root
+Alternatively, an `.ibtprojects` file placed in the user's home directory can
+be used to specify the location of the `Ibtfile` for zero or more project root
 directories for situations where the IBT configuration must be kept out of the
 source tree.
 
