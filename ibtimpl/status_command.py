@@ -15,7 +15,11 @@ from ibtimpl.util import *
 
 class StatusCommand(Command):
     def __init__(self):
-        super(StatusCommand, self).__init__("status", "Show project status")
+        super(StatusCommand, self).__init__("status")
+
+    def add_subparser(self, subparsers):
+        p = subparsers.add_parser(self.name, help="Show project status")
+        p.set_defaults(handler=self.run)
 
     def run(self, ctx, args):
         uid, group_name, gid, user_name = ctx.user_info()

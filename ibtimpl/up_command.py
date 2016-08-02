@@ -16,9 +16,13 @@ from ibtimpl.util import *
 
 class UpCommand(Command):
     def __init__(self):
-        super(UpCommand, self).__init__("up", "Create project image")
-        self.parser.add_argument("--destroy", "-d", action="store_true", help="destroy before recreating project image")
-        self.parser.add_argument("--docker-build", "-b", action="store_true", help="rebuild base image before creating project image")
+        super(UpCommand, self).__init__("up")
+
+    def add_subparser(self, subparsers):
+        p = subparsers.add_parser(self.name, help="Create project image")
+        p.add_argument("--destroy", "-d", action="store_true", help="destroy before recreating project image")
+        p.add_argument("--docker-build", "-b", action="store_true", help="rebuild base image before creating project image")
+        p.set_defaults(handler=self.run)
 
     def run(self, ctx, args):
         docker = ctx.settings.get("docker", None)

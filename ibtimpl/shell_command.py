@@ -7,6 +7,7 @@
 #
 ###############################################################################
 
+import argparse
 import os
 
 from ibtimpl.command import *
@@ -16,9 +17,13 @@ from ibtimpl.util import *
 
 class ShellCommand(Command):
     def __init__(self):
-        super(ShellCommand, self).__init__("shell", "Run shell inside container")
-        self.parser.add_argument("command", metavar="COMMAND", nargs="?", help="command")
-        self.parser.add_argument("args", metavar="ARGS", nargs=argparse.REMAINDER, help="arguments")
+        super(ShellCommand, self).__init__("shell")
+
+    def add_subparser(self, subparsers):
+        p = subparsers.add_parser(self.name, help="Run interactive shell inside container")
+        p.add_argument("command", metavar="COMMAND", nargs="?", help="command")
+        p.add_argument("args", metavar="ARGS", nargs=argparse.REMAINDER, help="arguments")
+        p.set_defaults(handler=self.run)
 
     def run(self, ctx, args):
         if not docker_image_exists(ctx.image_id):

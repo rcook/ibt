@@ -16,8 +16,12 @@ from ibtimpl.docker_util import *
 
 class ScriptCommand(Command):
     def __init__(self):
-        super(ScriptCommand, self).__init__("script", "Run script inside container")
-        self.parser.add_argument("script_path", metavar="SCRIPTPATH", help="script to run")
+        super(ScriptCommand, self).__init__("script")
+
+    def add_subparser(self, subparsers):
+        p = subparsers.add_parser(self.name, help="Run script inside container")
+        p.add_argument("script_path", metavar="SCRIPTPATH", help="script to run")
+        p.set_defaults(handler=self.run)
 
     def run(self, ctx, args):
         if not docker_image_exists(ctx.image_id):

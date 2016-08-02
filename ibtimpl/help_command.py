@@ -12,7 +12,11 @@ from ibtimpl.util import *
 
 class HelpCommand(Command):
     def __init__(self):
-        super(HelpCommand, self).__init__("help", "Display summary of standard commands")
+        super(HelpCommand, self).__init__("help")
+
+    def add_subparser(self, subparsers):
+        p = subparsers.add_parser(self.name, help="Display summary of standard commands")
+        p.set_defaults(handler=self.run)
 
     def run(self, ctx, args):
         print("IBT: Isolated Build Tool")

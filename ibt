@@ -9,6 +9,7 @@
 #
 ###############################################################################
 
+import argparse
 import os
 import shlex
 import sys
@@ -37,20 +38,18 @@ def run_command(ctx, argv):
     args = command.parser.parse_args(argv[1 : ])
     command.run(ctx, args)
 
-def main_inner(ctx, argv):
-    if len(argv) < 2:
-        show_usage(ctx)
-        return
+def format_alias_description(alias):
+    if isinstance(alias, list):
+        return "  Command:\n{}".format("\n".join(map(lambda x: "  $ {}".format(x), alias)))
+    else:
+        return "  Command:\n  $ {}".format(alias)
 
-    name = argv[1]
-    aliases = ctx.settings.get("aliases", None)
-    alias = None if aliases is None else aliases.get(name, None)
-    if alias is None:
-        run_command(ctx, argv[1 : ])
-    elif isinstance(alias, list):
+def handle_alias(parser, alias, ctx):
+    if isinstance(alias, list):
         RUN_COMMAND.run_lines(ctx, alias)
     else:
-        run_command(ctx, shlex.split(alias))
+        args = parser.parse_args(shlex.split(alias))
+        args.handler(ctx, args)
 
 def main(dir, argv):
     if not docker_installed():
@@ -70,7 +69,33 @@ def main(dir, argv):
         StatusCommand().run(ctx, [])
         return
 
-    main_inner(ctx, argv)
+    parser = argparse.ArgumentParser(description="IBT: Isolated Build Tool (https://github.com/rcook/ibt)")
+
+    subparsers = parser.add_subparsers(
+        title="Subcommands and aliases",
+        description="Valid subcommands and aliases",
+        help="Additional help")
+
+    commands = get_commands()
+    for key in sorted(commands):
+        command = commands[key]
+        command.add_subparser(subparsers)
+
+    aliases = ctx.settings.get("aliases", None)
+    if aliases is not None:
+        for key in sorted(aliases):
+            alias = aliases[key]
+            p = subparsers.add_parser(
+                key,
+                help="<alias>",
+                description=format_alias_description(alias),
+                formatter_class=argparse.RawDescriptionHelpFormatter)
+            p.set_defaults(handler=
+                lambda ctx, _, alias=alias:
+                   handle_alias(parser, alias, ctx))
+
+    args = parser.parse_args(argv[1 : ])
+    args.handler(ctx, args)
 
 if __name__ == "__main__":
     main(os.getcwd(), sys.argv)

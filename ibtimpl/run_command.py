@@ -16,9 +16,13 @@ from ibtimpl.util import *
 
 class RunCommand(Command):
     def __init__(self):
-        super(RunCommand, self).__init__("run", "Run command inside container")
-        self.parser.add_argument("command", metavar="COMMAND", help="command")
-        self.parser.add_argument("args", metavar="ARGS", nargs=argparse.REMAINDER, help="arguments")
+        super(RunCommand, self).__init__("run")
+
+    def add_subparser(self, subparsers):
+        p = subparsers.add_parser(self.name, help="Run command inside container")
+        p.add_argument("command", metavar="COMMAND", help="command")
+        p.add_argument("args", metavar="ARGS", nargs=argparse.REMAINDER, help="arguments")
+        p.set_defaults(handler=self.run)
 
     def run(self, ctx, args):
         if not docker_image_exists(ctx.image_id):
