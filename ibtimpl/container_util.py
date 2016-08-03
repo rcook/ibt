@@ -7,11 +7,13 @@
 #
 ###############################################################################
 
+import colorama
 import os
+import pipes
 
 from ibtimpl.util import *
 
-def _build_command(ctx, container_working_dir, args, subcommand):
+def build_command(ctx, container_working_dir, command_args, subcommand):
     additional_args = []
 
     ports = {}
@@ -55,18 +57,28 @@ def _build_command(ctx, container_working_dir, args, subcommand):
         sum([["-p", "{}:{}".format(key, ports[key])] for key in ports], []) + \
         sum([["-v", "{}:{}".format(key, volumes[key])] for key in volumes], []) + \
         additional_args + \
-        ([] if args is None else args) + \
+        ([] if command_args is None else command_args) + \
         [ctx.image_id] + \
         ([] if subcommand is None else subcommand)
 
     return command, volumes
 
-def check_process_in_container(ctx, container_working_dir, args=None, subcommand=None):
-    command, volumes = _build_command(ctx, container_working_dir, args, subcommand)
+def shell_join(command):
+    return " ".join(pipes.quote(s) for s in command)
+
+def trace_command(command):
+    print(colorama.Fore.YELLOW + shell_join(command) + colorama.Style.RESET_ALL)
+
+def check_process_in_container(ctx, args, container_working_dir, command_args=None, subcommand=None):
+    command, volumes = build_command(ctx, container_working_dir, command_args, subcommand)
+    if args.trace:
+        trace_command(command)
     with ensure_dirs(volumes.keys()):
         subprocess.check_call(command)
 
-def call_process_in_container(ctx, container_working_dir, args=None, subcommand=None):
-    command, volumes = _build_command(ctx, container_working_dir, args, subcommand)
+def call_process_in_container(ctx, args, container_working_dir, command_args=None, subcommand=None):
+    command, volumes = build_command(ctx, container_working_dir, command_args, subcommand)
+    if args.trace:
+        trace_command(command)
     with ensure_dirs(volumes.keys()):
         return subprocess.call(command)

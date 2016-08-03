@@ -10,6 +10,7 @@
 ###############################################################################
 
 import argparse
+import colorama
 import os
 import shlex
 import sys
@@ -44,9 +45,9 @@ def format_alias_description(alias):
     else:
         return "  Command:\n  $ {}".format(alias)
 
-def handle_alias(parser, alias, ctx):
+def handle_alias(parser, alias, ctx, args):
     if isinstance(alias, list):
-        RUN_COMMAND.run_lines(ctx, alias)
+        RUN_COMMAND.run_lines(ctx, args, alias)
     else:
         args = parser.parse_args(shlex.split(alias))
         args.handler(ctx, args)
@@ -70,6 +71,7 @@ def main(dir, argv):
         return
 
     parser = argparse.ArgumentParser(description="IBT: Isolated Build Tool (https://github.com/rcook/ibt)")
+    parser.add_argument("--trace", "-t", action="store_true", help="trace Docker commands executed by tool")
 
     subparsers = parser.add_subparsers(
         title="Subcommands and aliases",
@@ -91,11 +93,12 @@ def main(dir, argv):
                 description=format_alias_description(alias),
                 formatter_class=argparse.RawDescriptionHelpFormatter)
             p.set_defaults(handler=
-                lambda ctx, _, alias=alias:
-                   handle_alias(parser, alias, ctx))
+                lambda ctx, args, alias=alias:
+                   handle_alias(parser, alias, ctx, args))
 
     args = parser.parse_args(argv[1 : ])
     args.handler(ctx, args)
 
 if __name__ == "__main__":
+    colorama.init()
     main(os.getcwd(), sys.argv)

@@ -28,9 +28,9 @@ class RunCommand(Command):
         if not docker_image_exists(ctx.image_id):
             raise RuntimeError("Project has not been upped")
 
-        self.run_lines(ctx, [" ".join([args.command] + args.args)])
+        self.run_lines(ctx, args, [" ".join([args.command] + args.args)])
 
-    def run_lines(self, ctx, lines):
+    def run_lines(self, ctx, args, lines):
         rel_dir = os.path.relpath(ctx.dir, ctx.project_info.dir)
         container_working_dir = os.path.join(ctx.container_project_dir, rel_dir)
 
@@ -38,4 +38,4 @@ class RunCommand(Command):
             local_path = os.path.join(dir, "script")
             container_path = os.path.join(ctx.container_dot_dir, os.path.relpath(local_path, ctx.dot_dir))
             make_shell_script(local_path, lines)
-            docker_run(ctx, container_working_dir, container_path)
+            docker_run(ctx, args, container_working_dir, container_path)

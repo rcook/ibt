@@ -44,4 +44,4 @@ class ScriptCommand(Command):
                 f.write("chmod +x {}\n".format(container_input_path))
                 f.write(container_input_path + "\n")
 
-            docker_run(ctx, container_working_dir, container_path)
+            docker_run(ctx, args, container_working_dir, container_path)
