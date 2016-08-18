@@ -43,11 +43,13 @@ $ git clone https://github.com/rcook/ibt.git
 $ ln -sf $PWD/ibt/ibt $HOME/bin/ibt
 ```
 
-You may need to install [pip][pip] and the YAML package as follows:
+You may need to install [pip][pip] and the YAML and Colorama packages as
+follows:
 
 ```bash
 $ python get-pip.py --user
 $ pip install --user pyyaml
+$ pip install --user colorama
 ```
 
 ## Standard commands
