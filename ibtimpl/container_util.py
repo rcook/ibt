@@ -10,8 +10,17 @@
 import colorama
 import os
 import pipes
+import re
 
 from ibtimpl.util import *
+
+def expand(env_vars, value):
+    def replace(m):
+        key = m.group(1)
+        replacement = env_vars.get(key)
+        return m.group(0) if replacement is None else replacement
+
+    return re.sub('\$([A-Za-z_][A-Za-z_0-9]*)', replace, value)
 
 def build_command(ctx, container_working_dir, command_args, subcommand):
     additional_args = []
@@ -43,6 +52,11 @@ def build_command(ctx, container_working_dir, command_args, subcommand):
 
     _, _, _, user_name = ctx.user_info()
 
+    env_vars = {
+        "IBTPROJECTDIR": ctx.container_project_dir,
+        "IBTUSER": user_name
+    }
+
     command = [
         "docker",
         "run",
@@ -50,12 +64,11 @@ def build_command(ctx, container_working_dir, command_args, subcommand):
         container_working_dir,
         "-u",
         user_name,
-        "--rm",
-        "-e",
-        "IBTPROJECTDIR={}".format(ctx.container_project_dir)
+        "--rm"
     ] + \
         sum([["-p", "{}:{}".format(key, ports[key])] for key in ports], []) + \
-        sum([["-v", "{}:{}".format(key, volumes[key])] for key in volumes], []) + \
+        sum([["-v", "{}:{}".format(key, expand(env_vars, volumes[key]))] for key in volumes], []) + \
+        sum([["-e", "{}={}".format(key, env_vars[key])] for key in env_vars], []) + \
         additional_args + \
         ([] if command_args is None else command_args) + \
         [ctx.image_id] + \
