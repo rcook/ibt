@@ -74,13 +74,13 @@ def flatten(*args):
     return output
 
 @contextlib.contextmanager
-def ensure_dirs(*dirs):
+def ensure_mount_sources(*paths):
     try:
         cleanup_dirs = []
-        for dir in flatten(dirs):
-            if dir is not None and not os.path.isdir(dir):
-                cleanup_dirs.append(dir)
-                os.makedirs(dir)
+        for p in flatten(paths):
+            if p is not None and not os.path.isdir(p) and not os.path.isfile(p):
+                cleanup_dirs.append(p)
+                os.makedirs(p)
         yield
     finally:
         for dir in cleanup_dirs:
@@ -91,7 +91,7 @@ def ensure_dirs(*dirs):
 
 @contextlib.contextmanager
 def temp_dir(dir=None):
-    with ensure_dirs(dir):
+    with ensure_mount_sources(dir):
         temp_path = tempfile.mkdtemp(dir=dir)
         try:
             yield temp_path

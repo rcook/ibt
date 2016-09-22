@@ -86,12 +86,12 @@ def check_process_in_container(ctx, args, container_working_dir, command_args=No
     command, volumes = build_command(ctx, container_working_dir, command_args, subcommand)
     if args.trace:
         trace_command(command)
-    with ensure_dirs(volumes.keys()):
+    with ensure_mount_sources(volumes.keys()):
         subprocess.check_call(command)
 
 def call_process_in_container(ctx, args, container_working_dir, command_args=None, subcommand=None):
     command, volumes = build_command(ctx, container_working_dir, command_args, subcommand)
     if args.trace:
         trace_command(command)
-    with ensure_dirs(volumes.keys()):
+    with ensure_mount_sources(volumes.keys()):
         return subprocess.call(command)
