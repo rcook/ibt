@@ -22,7 +22,12 @@ def expand(env_vars, value):
 
     return re.sub('\$([A-Za-z_][A-Za-z_0-9]*)', replace, value)
 
-def build_command(ctx, container_working_dir, command_args, subcommand):
+def build_command(ctx, command_args, subcommand):
+    container_project_dir = ctx.settings.get("container-project-dir", ctx.default_container_project_dir)
+
+    rel_dir = os.path.relpath(ctx.dir, ctx.project_info.dir)
+    container_working_dir = os.path.join(container_project_dir, rel_dir)
+
     additional_args = []
 
     ports = {}
@@ -37,7 +42,7 @@ def build_command(ctx, container_working_dir, command_args, subcommand):
             ports[host_port] = container_port
 
     volumes = {
-        ctx.project_info.dir: ctx.container_project_dir,
+        ctx.project_info.dir: container_project_dir,
         ctx.dot_dir: ctx.container_dot_dir
     }
 
@@ -53,7 +58,7 @@ def build_command(ctx, container_working_dir, command_args, subcommand):
     _, _, _, user_name = ctx.user_info()
 
     env_vars = {
-        "IBTPROJECTDIR": ctx.container_project_dir,
+        "IBTPROJECTDIR": container_project_dir,
         "IBTUSER": user_name
     }
 
@@ -82,15 +87,15 @@ def shell_join(command):
 def trace_command(command):
     print(colorama.Fore.YELLOW + shell_join(command) + colorama.Style.RESET_ALL)
 
-def check_process_in_container(ctx, args, container_working_dir, command_args=None, subcommand=None):
-    command, volumes = build_command(ctx, container_working_dir, command_args, subcommand)
+def check_process_in_container(ctx, args, command_args=None, subcommand=None):
+    command, volumes = build_command(ctx, command_args, subcommand)
     if args.trace:
         trace_command(command)
     with ensure_mount_sources(volumes.keys()):
         subprocess.check_call(command)
 
-def call_process_in_container(ctx, args, container_working_dir, command_args=None, subcommand=None):
-    command, volumes = build_command(ctx, container_working_dir, command_args, subcommand)
+def call_process_in_container(ctx, args, command_args=None, subcommand=None):
+    command, volumes = build_command(ctx, command_args, subcommand)
     if args.trace:
         trace_command(command)
     with ensure_mount_sources(volumes.keys()):

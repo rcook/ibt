@@ -39,7 +39,8 @@ class StatusCommand(Command):
 
         print("Docker container information:")
         print("  Docker image ID:     {}".format(ctx.image_id))
-        print("  Project directory:   {}".format(ctx.container_project_dir))
+        container_project_dir = ctx.settings.get("container-project-dir", ctx.default_container_project_dir)
+        print("  Project directory:   {}".format(container_project_dir))
         print("  Temporary directory: {}".format(ctx.container_dot_dir))
         docker = ctx.settings.get("docker", None)
         docker_image = None if docker is None else docker.get("image", None)

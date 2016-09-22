@@ -21,7 +21,7 @@ class Context(object):
         self._project_id = hashlib.md5(self._project_info.dir).hexdigest()
         self._image_id = "ibt-{}".format(self._project_id)
         self._dot_dir = os.path.join(os.path.dirname(self._project_info.config_path), ".ibt")
-        self._container_project_dir = "/{}".format(os.path.basename(self._project_info.dir))
+        self._default_container_project_dir = "/{}".format(os.path.basename(self._project_info.dir))
         self._container_dot_dir = "/.ibt"
         self._settings = None
 
@@ -41,7 +41,7 @@ class Context(object):
     def dot_dir(self): return self._dot_dir
 
     @property
-    def container_project_dir(self): return self._container_project_dir
+    def default_container_project_dir(self): return self._default_container_project_dir
 
     @property
     def container_dot_dir(self): return self._container_dot_dir

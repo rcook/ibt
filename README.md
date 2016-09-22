@@ -76,6 +76,8 @@ source tree.
 * `docker`: specifies base Docker image information for project including
 `image` and `build`
 * `ports`: (optional) one or more host port-container port pairs to
+* `container-project-dir`: (optional) specifies directory to which project
+directory is mapped in container
 configure port forwarding
 * `volumes`: (optional) one or more additional volumes to mount inside
 container

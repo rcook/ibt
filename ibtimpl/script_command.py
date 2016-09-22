@@ -27,9 +27,6 @@ class ScriptCommand(Command):
         if not docker_image_exists(ctx.image_id):
             raise RuntimeError("Project has not been upped")
 
-        rel_dir = os.path.relpath(ctx.dir, ctx.project_info.dir)
-        container_working_dir = os.path.join(ctx.container_project_dir, rel_dir)
-
         with temp_dir(ctx.dot_dir) as dir:
             local_path = os.path.join(dir, "script")
             container_path = os.path.join(ctx.container_dot_dir, os.path.relpath(local_path, ctx.dot_dir))
@@ -44,4 +41,4 @@ class ScriptCommand(Command):
                 f.write("chmod +x {}\n".format(container_input_path))
                 f.write(container_input_path + "\n")
 
-            docker_run(ctx, args, container_working_dir, container_path)
+            docker_run(ctx, args, container_path)
