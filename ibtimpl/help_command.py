@@ -39,7 +39,7 @@ class HelpCommand(Command):
         print("Commands:")
         for name in sorted(commands):
             command = commands[name]
-            print("  {}  {}".format(name.ljust(max_name_len), command.parser.description))
+            print("  {}  (help not implemented)".format(name.ljust(max_name_len)))
 
         if has_aliases:
             print("\nProject aliases:")
