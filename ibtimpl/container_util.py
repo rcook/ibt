@@ -67,8 +67,8 @@ def build_command(ctx, container_working_dir, command_args, subcommand):
         "--rm"
     ] + \
         sum([["-p", "{}:{}".format(key, ports[key])] for key in ports], []) + \
-        sum([["-v", "{}:{}".format(key, expand(env_vars, volumes[key]))] for key in volumes], []) + \
-        sum([["-e", "{}={}".format(key, env_vars[key])] for key in env_vars], []) + \
+        sum([["--volume", "{}:{}".format(key, expand(env_vars, volumes[key]))] for key in volumes], []) + \
+        sum([["--env", "{}={}".format(key, env_vars[key])] for key in env_vars], []) + \
         additional_args + \
         ([] if command_args is None else command_args) + \
         [ctx.image_id] + \
