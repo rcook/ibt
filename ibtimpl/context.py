@@ -9,6 +9,7 @@
 
 import hashlib
 import os
+import re
 import yaml
 
 from ibtimpl.util import *
@@ -56,4 +57,6 @@ class Context(object):
         return os.path.abspath(os.path.join(self._project_info.dir, path))
 
     def user_info(self):
-        return check_process(["stat", "-c", "%u:%G:%g:%U", self._project_info.dir]).strip().split(":")
+      def sanitize(s):
+        return re.sub("[{}]".format(re.escape("^")), "_", s)
+      return map(sanitize, check_process(["stat", "-c", "%u:%G:%g:%U", self._project_info.dir]).strip().split(":"))
