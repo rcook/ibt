@@ -59,8 +59,14 @@ def build_command(ctx, command_args, subcommand):
 
     env_vars = {
         "IBTPROJECTDIR": container_project_dir,
-        "IBTUSER": user_name
+        "IBTUSER": user_name,
+        "USER": user_name
     }
+
+    env_vars_setting = ctx.settings.get("env_vars", None)
+    if env_vars_setting is not None:
+        for key in env_vars_setting:
+            env_vars[key] = env_vars_setting[key]
 
     command = [
         "docker",

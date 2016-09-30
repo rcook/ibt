@@ -74,6 +74,8 @@ source tree.
 
 * `aliases`: (optional) one or more project-specific command aliases
 * `docker`: specifies base Docker image information for project including
+* `env_vars`: (optional) one or more environment variables to define inside
+container
 `image` and `build`
 * `ports`: (optional) one or more host port-container port pairs to
 * `container-project-dir`: (optional) specifies directory to which project
