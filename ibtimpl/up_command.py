@@ -52,7 +52,7 @@ class UpCommand(Command):
                 with open(os.path.join(dir, "Dockerfile"), "wt") as f:
                     f.write("FROM {}\n".format(docker_image))
                     f.write("RUN groupadd -g {} {}\n".format(gid, group_name))
-                    f.write("RUN useradd -u {} -g {} {}\n".format(uid, gid, user_name))
+                    f.write("RUN useradd -l -u {} -g {} {}\n".format(uid, gid, user_name))
 
             with open(os.path.join(dir, ".dockerignore"), "wt") as f:
                 f.write("*\n")
