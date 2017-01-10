@@ -22,10 +22,12 @@ class UpCommand(Command):
         p = subparsers.add_parser(self.name, help="Create project image")
         p.add_argument("--destroy", "-d", action="store_true", help="destroy before recreating project image")
         p.add_argument("--docker-build", "-b", action="store_true", help="rebuild base image before creating project image")
+        p.add_argument("--config", "-c", help="specify a Docker configuration")
         p.set_defaults(handler=self.run)
 
     def run(self, ctx, args):
-        docker = ctx.settings.get("docker", None)
+        parent_settings = ctx.settings if args.config is None else ctx.settings["configurations"][args.config]
+        docker = parent_settings.get("docker", None)
         if docker is None:
             docker_image = None
             docker_build = None
