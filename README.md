@@ -33,24 +33,20 @@ resemble Vagrant workflows where `up`, `destroy`, `run` correspond closely to
 
 ## Installation
 
-Ensure you have a working [Python 2.7][python] installation on the host machine
-as well as [Docker][docker]. Simply clone this repository and symlink the `ibt`
-script into a directory on your search path. These instructions assume that the
-`bin` directory within your home directory is on the search path:
+Ensure you have a working [Python 2.7][python] installation on the host machine as well as [Docker][docker]. Simply clone this repository and symlink the `ibt.py` script into a directory on your search path. These instructions assume that the `bin` directory within your home directory is on the search path:
 
 ```bash
 $ git clone https://github.com/rcook/ibt.git
 $ ln -sf $PWD/ibt/ibt $HOME/bin/ibt
 ```
 
-You may need to install [pip][pip] and the YAML and Colorama packages as
-follows:
+You will need to install this package's dependencies using [pip][pip]:
 
 ```bash
-$ python get-pip.py --user
-$ pip install --user pyyaml
-$ pip install --user colorama
+$ pip install -r requirements.txt
 ```
+
+Alternatively, symlink to `ibt.sh` which is a wrapper around the Python script which uses [virtualenv][virtualenv].
 
 ## Standard commands
 
@@ -190,3 +186,4 @@ Copyright &copy; 2016, Richard Cook. All rights reserved.
 [pip]: https://pip.pypa.io/en/stable/installing/
 [python]: https://www.python.org/downloads/
 [vagrant]: https://www.vagrantup.com/
+[virtualenv]: https://virtualenv.pypa.io/en/stable/
