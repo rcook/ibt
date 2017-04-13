@@ -25,22 +25,6 @@ from ibtimpl.util import get_commands
 _HELP_COMMAND = HelpCommand()
 _RUN_COMMAND = RunCommand()
 
-def _show_usage(ctx):
-    _HELP_COMMAND.run(ctx, [])
-
-def _format_alias_description(alias):
-    if isinstance(alias, list):
-        return "  Command:\n{}".format("\n".join(map(lambda x: "  $ {}".format(x), alias)))
-    else:
-        return "  Command:\n  $ {}".format(alias)
-
-def _handle_alias(parser, alias, ctx, args):
-    if isinstance(alias, list):
-        _RUN_COMMAND.run_lines(ctx, args, alias)
-    else:
-        args = parser.parse_args(shlex.split(alias))
-        args.handler(ctx, args)
-
 class ThrowingArgumentParserError(Exception):
     def __init__(self, *args, **kwargs):
         super(ThrowingArgumentParserError, self).__init__(*args, **kwargs)
@@ -64,6 +48,19 @@ class ThrowingArgumentParser(argparse.ArgumentParser):
             return self.parse_args(argv)
         except ThrowingArgumentParserError:
             return
+
+def _format_alias_description(alias):
+    if isinstance(alias, list):
+        return "  Command:\n{}".format("\n".join(map(lambda x: "  $ {}".format(x), alias)))
+    else:
+        return "  Command:\n  $ {}".format(alias)
+
+def _handle_alias(parser, alias, ctx, args):
+    if isinstance(alias, list):
+        _RUN_COMMAND.run_lines(ctx, args, alias)
+    else:
+        args = parser.parse_args(shlex.split(alias))
+        args.handler(ctx, args)
 
 def _main(working_dir, argv):
     ctx = Context(working_dir)
