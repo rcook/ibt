@@ -27,7 +27,13 @@ class UpCommand(Command):
         p.set_defaults(handler=self.run)
 
     def run(self, ctx, args):
-        parent_settings = ctx.settings if args.config is None else ctx.settings["configurations"][args.config]
+        if args.config is None:
+            parent_settings = ctx.settings
+        else:
+            configs = ctx.settings["configurations"]
+            parent_settings = configs.get(args.config)
+            if parent_settings is None:
+                raise RuntimeError("Configuration {} not found (available configurations: {})".format(args.config, ", ".join(configs.keys())))
 
         docker = parent_settings.get("docker", None)
         if docker is None:
