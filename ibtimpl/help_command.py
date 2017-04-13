@@ -15,7 +15,7 @@ from ibtimpl.util import get_commands
 
 # Yes, this is a hack
 # I'm too lazy to refactor the command classes for now
-def get_command_help(command):
+def _get_command_help(command):
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers()
     command.add_subparser(subparsers)
@@ -50,7 +50,7 @@ class HelpCommand(Command):
         print("Commands:")
         for name in sorted(commands):
             command = commands[name]
-            help = get_command_help(command)
+            help = _get_command_help(command)
             print("  {}  {}".format(name.ljust(max_name_len), help))
 
         if has_aliases:

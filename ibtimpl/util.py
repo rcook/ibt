@@ -14,6 +14,15 @@ import shutil
 import subprocess
 import tempfile
 
+def _flatten(*args):
+    output = []
+    for arg in args:
+        if hasattr(arg, "__iter__"):
+            output.extend(_flatten(*arg))
+        else:
+            output.append(arg)
+    return output
+
 def get_commands():
     if get_commands.commands is None:
         from ibtimpl.destroy_command import DestroyCommand
@@ -74,20 +83,11 @@ def temp_file(dir=None):
         if os.path.isfile(temp_path):
             os.unlink(temp_path)
 
-def flatten(*args):
-    output = []
-    for arg in args:
-        if hasattr(arg, "__iter__"):
-            output.extend(flatten(*arg))
-        else:
-            output.append(arg)
-    return output
-
 @contextlib.contextmanager
 def ensure_mount_sources(*paths):
     try:
         cleanup_dirs = []
-        for p in flatten(paths):
+        for p in _flatten(paths):
             if p is not None and not os.path.isdir(p) and not os.path.isfile(p):
                 cleanup_dirs.append(p)
                 os.makedirs(p)

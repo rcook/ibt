@@ -14,15 +14,15 @@ import subprocess
 
 from ibtimpl.util import ensure_mount_sources
 
-def expand(env_vars, value):
-    def replace(m):
+def _expand(env_vars, value):
+    def _replace(m):
         key = m.group(1)
         replacement = env_vars.get(key)
         return m.group(0) if replacement is None else replacement
 
-    return re.sub('\$([A-Za-z_][A-Za-z_0-9]*)', replace, value)
+    return re.sub('\$([A-Za-z_][A-Za-z_0-9]*)', _replace, value)
 
-def build_command(ctx, command_args, subcommand):
+def _build_command(ctx, command_args, subcommand):
     container_project_dir = ctx.settings.get("container-project-dir", ctx.default_container_project_dir)
 
     rel_dir = os.path.relpath(ctx.dir, ctx.project_info.dir)
@@ -78,7 +78,7 @@ def build_command(ctx, command_args, subcommand):
         "--rm"
     ] + \
         sum([["-p", "{}:{}".format(key, ports[key])] for key in ports], []) + \
-        sum([["--volume", "{}:{}".format(key, expand(env_vars, volumes[key]))] for key in volumes], []) + \
+        sum([["--volume", "{}:{}".format(key, _expand(env_vars, volumes[key]))] for key in volumes], []) + \
         sum([["--env", "{}={}".format(key, env_vars[key])] for key in env_vars], []) + \
         additional_args + \
         ([] if command_args is None else command_args) + \
@@ -88,14 +88,14 @@ def build_command(ctx, command_args, subcommand):
     return command, volumes
 
 def check_process_in_container(ctx, args, command_args=None, subcommand=None):
-    command, volumes = build_command(ctx, command_args, subcommand)
+    command, volumes = _build_command(ctx, command_args, subcommand)
     if args.trace:
         trace_command(command)
     with ensure_mount_sources(volumes.keys()):
         subprocess.check_call(command)
 
 def call_process_in_container(ctx, args, command_args=None, subcommand=None):
-    command, volumes = build_command(ctx, command_args, subcommand)
+    command, volumes = _build_command(ctx, command_args, subcommand)
     if args.trace:
         trace_command(command)
     with ensure_mount_sources(volumes.keys()):

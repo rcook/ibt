@@ -22,37 +22,26 @@ from ibtimpl.project_info import ProjectInfo
 from ibtimpl.run_command import RunCommand
 from ibtimpl.util import get_commands
 
-HELP_COMMAND = HelpCommand()
-RUN_COMMAND = RunCommand()
+_HELP_COMMAND = HelpCommand()
+_RUN_COMMAND = RunCommand()
 
-def show_usage(ctx):
-    HELP_COMMAND.run(ctx, [])
+def _show_usage(ctx):
+    _HELP_COMMAND.run(ctx, [])
 
-def run_command(ctx, argv):
-    name = argv[0]
-    command = get_commands().get(name, None)
-    if command is None:
-        print("Unrecognized command \"{}\"!\n".format(name))
-        show_usage(ctx)
-        return
-
-    args = command.parser.parse_args(argv[1 : ])
-    command.run(ctx, args)
-
-def format_alias_description(alias):
+def _format_alias_description(alias):
     if isinstance(alias, list):
         return "  Command:\n{}".format("\n".join(map(lambda x: "  $ {}".format(x), alias)))
     else:
         return "  Command:\n  $ {}".format(alias)
 
-def handle_alias(parser, alias, ctx, args):
+def _handle_alias(parser, alias, ctx, args):
     if isinstance(alias, list):
-        RUN_COMMAND.run_lines(ctx, args, alias)
+        _RUN_COMMAND.run_lines(ctx, args, alias)
     else:
         args = parser.parse_args(shlex.split(alias))
         args.handler(ctx, args)
 
-def main(dir, argv):
+def _main(dir, argv):
     if not docker_installed():
         print("Please install Docker")
         return
@@ -90,15 +79,15 @@ def main(dir, argv):
             p = subparsers.add_parser(
                 key,
                 help="<alias>",
-                description=format_alias_description(alias),
+                description=_format_alias_description(alias),
                 formatter_class=argparse.RawDescriptionHelpFormatter)
             p.set_defaults(handler=
                 lambda ctx, args, alias=alias:
-                   handle_alias(parser, alias, ctx, args))
+                    _handle_alias(parser, alias, ctx, args))
 
     args = parser.parse_args(argv[1 : ])
     args.handler(ctx, args)
 
 if __name__ == "__main__":
     colorama.init()
-    main(os.getcwd(), sys.argv)
+    _main(os.getcwd(), sys.argv)
