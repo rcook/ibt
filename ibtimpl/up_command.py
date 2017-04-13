@@ -7,12 +7,13 @@
 #
 ###############################################################################
 
-import argparse
+from __future__ import print_function
 import os
 
-from ibtimpl.command import *
-from ibtimpl.docker_util import *
-from ibtimpl.util import *
+from ibtimpl.command import Command
+from ibtimpl.docker_util import docker_image_build, docker_image_remove
+from ibtimpl.tracing import trace_data
+from ibtimpl.util import temp_dir
 
 class UpCommand(Command):
     def __init__(self):
@@ -27,6 +28,7 @@ class UpCommand(Command):
 
     def run(self, ctx, args):
         parent_settings = ctx.settings if args.config is None else ctx.settings["configurations"][args.config]
+
         docker = parent_settings.get("docker", None)
         if docker is None:
             docker_image = None
@@ -34,6 +36,8 @@ class UpCommand(Command):
         else:
             docker_image = docker.get("image", None)
             docker_build = docker.get("build", None)
+
+        trace_data(args, docker)
 
         if args.docker_build:
             if docker_build is None:

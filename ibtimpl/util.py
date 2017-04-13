@@ -1,5 +1,16 @@
+###############################################################################
+#
+# IBT: Isolated Build Tool
+# Copyright (C) 2017, Richard Cook. All rights reserved.
+#
+# Simple wrappers around Docker etc. for fully isolated build environments
+#
+###############################################################################
+
+from __future__ import print_function
 import contextlib
 import os
+import pipes
 import shutil
 import subprocess
 import tempfile
@@ -98,3 +109,6 @@ def temp_dir(dir=None):
         finally:
             if os.path.isdir(temp_path):
                 shutil.rmtree(temp_path)
+
+def shell_join(command):
+    return " ".join(pipes.quote(s) for s in command)

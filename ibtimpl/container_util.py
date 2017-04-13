@@ -7,12 +7,11 @@
 #
 ###############################################################################
 
+from __future__ import print_function
 import colorama
 import os
 import pipes
 import re
-
-from ibtimpl.util import *
 
 def expand(env_vars, value):
     def replace(m):
@@ -86,12 +85,6 @@ def build_command(ctx, command_args, subcommand):
         ([] if subcommand is None else subcommand)
 
     return command, volumes
-
-def shell_join(command):
-    return " ".join(pipes.quote(s) for s in command)
-
-def trace_command(command):
-    print(colorama.Fore.YELLOW + shell_join(command) + colorama.Style.RESET_ALL)
 
 def check_process_in_container(ctx, args, command_args=None, subcommand=None):
     command, volumes = build_command(ctx, command_args, subcommand)
