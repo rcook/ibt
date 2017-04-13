@@ -7,12 +7,13 @@
 #
 ###############################################################################
 
+from __future__ import print_function
 import hashlib
 import os
 import re
 import yaml
 
-from ibtimpl.util import *
+from ibtimpl.util import check_process
 
 class Context(object):
     def __init__(self, project_info, dir):

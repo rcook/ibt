@@ -7,12 +7,13 @@
 #
 ###############################################################################
 
-import argparse
-import shutil
+from __future__ import print_function
 import os
+import shutil
 
-from ibtimpl.command import *
-from ibtimpl.docker_util import *
+from ibtimpl.command import Command
+from ibtimpl.docker_util import docker_image_exists
+from ibtimpl.util import temp_dir
 
 class ScriptCommand(Command):
     def __init__(self):

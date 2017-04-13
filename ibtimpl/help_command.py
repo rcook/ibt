@@ -7,10 +7,11 @@
 #
 ###############################################################################
 
+from __future__ import print_function
 import argparse
 
-from ibtimpl.command import *
-from ibtimpl.util import *
+from ibtimpl.command import Command
+from ibtimpl.util import get_commands
 
 # Yes, this is a hack
 # I'm too lazy to refactor the command classes for now

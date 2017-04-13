@@ -10,7 +10,6 @@
 from __future__ import print_function
 import contextlib
 import os
-import pipes
 import shutil
 import subprocess
 import tempfile

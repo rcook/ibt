@@ -11,8 +11,6 @@ from __future__ import print_function
 import colorama
 import json
 
-#from ibtimpl.util import *
-
 def _trace(s):
     print(colorama.Fore.YELLOW + s + colorama.Style.RESET_ALL)
 

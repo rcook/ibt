@@ -7,12 +7,13 @@
 #
 ###############################################################################
 
+from __future__ import print_function
 import argparse
 import os
 
-from ibtimpl.command import *
-from ibtimpl.docker_util import *
-from ibtimpl.util import *
+from ibtimpl.command import Command
+from ibtimpl.docker_util import docker_image_exists, docker_run
+from ibtimpl.util import make_shell_script, temp_dir
 
 class RunCommand(Command):
     def __init__(self):

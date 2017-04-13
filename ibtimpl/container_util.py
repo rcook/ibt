@@ -8,10 +8,11 @@
 ###############################################################################
 
 from __future__ import print_function
-import colorama
 import os
-import pipes
 import re
+import subprocess
+
+from ibtimpl.util import ensure_mount_sources
 
 def expand(env_vars, value):
     def replace(m):

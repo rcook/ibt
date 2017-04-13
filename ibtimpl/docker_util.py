@@ -7,8 +7,10 @@
 #
 ###############################################################################
 
-from ibtimpl.container_util import *
-from ibtimpl.util import *
+from __future__ import print_function
+
+from ibtimpl.container_util import check_process_in_container
+from ibtimpl.util import call_process, check_process
 
 def docker_installed():
     try:

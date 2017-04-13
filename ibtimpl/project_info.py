@@ -7,8 +7,8 @@
 #
 ###############################################################################
 
+from __future__ import print_function
 import os
-import sys
 import yaml
 
 # Detects current project directory and configuration path based on following

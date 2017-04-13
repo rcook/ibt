@@ -7,6 +7,8 @@
 #
 ###############################################################################
 
+from __future__ import print_function
+
 class Command(object):
     def __init__(self, name):
         self._name = name

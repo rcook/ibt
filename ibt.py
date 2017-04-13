@@ -9,18 +9,18 @@
 #
 ###############################################################################
 
+from __future__ import print_function
 import argparse
 import colorama
 import os
-import shlex
 import sys
 
-from ibtimpl.context import *
-from ibtimpl.docker_util import *
-from ibtimpl.help_command import *
-from ibtimpl.project_info import *
-from ibtimpl.run_command import *
-from ibtimpl.status_command import *
+from ibtimpl.context import Context
+from ibtimpl.docker_util import docker_installed
+from ibtimpl.help_command import HelpCommand
+from ibtimpl.project_info import ProjectInfo
+from ibtimpl.run_command import RunCommand
+from ibtimpl.util import get_commands
 
 HELP_COMMAND = HelpCommand()
 RUN_COMMAND = RunCommand()

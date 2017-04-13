@@ -7,10 +7,9 @@
 #
 ###############################################################################
 
-import argparse
+from __future__ import print_function
 
-from ibtimpl.command import *
-from ibtimpl.docker_util import *
+from ibtimpl.command import Command
 
 class DestroyCommand(Command):
     def __init__(self):

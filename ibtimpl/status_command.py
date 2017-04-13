@@ -7,11 +7,11 @@
 #
 ###############################################################################
 
+from __future__ import print_function
 import os
 
-from ibtimpl.command import *
-from ibtimpl.docker_util import *
-from ibtimpl.util import *
+from ibtimpl.command import Command
+from ibtimpl.docker_util import docker_image_exists
 
 class StatusCommand(Command):
     def __init__(self):
