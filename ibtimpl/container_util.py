@@ -12,6 +12,7 @@ import os
 import re
 import subprocess
 
+from ibtimpl.tracing import trace_command
 from ibtimpl.util import ensure_mount_sources
 
 def _expand(env_vars, value):
@@ -89,14 +90,12 @@ def _build_command(ctx, command_args, subcommand):
 
 def check_process_in_container(ctx, args, command_args=None, subcommand=None):
     command, volumes = _build_command(ctx, command_args, subcommand)
-    if args.trace:
-        trace_command(command)
+    trace_command(args, command)
     with ensure_mount_sources(volumes.keys()):
         subprocess.check_call(command)
 
 def call_process_in_container(ctx, args, command_args=None, subcommand=None):
     command, volumes = _build_command(ctx, command_args, subcommand)
-    if args.trace:
-        trace_command(command)
+    trace_command(args, command)
     with ensure_mount_sources(volumes.keys()):
         return subprocess.call(command)

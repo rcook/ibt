@@ -60,7 +60,7 @@ def _main(dir, argv):
         return
 
     parser = argparse.ArgumentParser(description="IBT: Isolated Build Tool (https://github.com/rcook/ibt)")
-    parser.add_argument("--trace", "-t", action="store_true", help="trace Docker commands executed by tool")
+    parser.add_argument("--verbose", "-v", action="store_true", help="output diagnostic information including Docker commands executed by tool")
 
     subparsers = parser.add_subparsers(
         title="Subcommands and aliases",

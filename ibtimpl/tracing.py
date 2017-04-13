@@ -15,10 +15,10 @@ def _trace(s):
     print(colorama.Fore.YELLOW + s + colorama.Style.RESET_ALL)
 
 def trace_command(args, command):
-    if args.trace:
+    if args.verbose:
         _trace(args, shell_join(command))
 
 def trace_data(args, data):
-    if args.trace:
+    if args.verbose:
         s = json.dumps(data, indent=2)
         _trace(s)
