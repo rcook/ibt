@@ -10,6 +10,7 @@
 from __future__ import print_function
 import contextlib
 import os
+import re
 import shutil
 import subprocess
 import tempfile
@@ -27,6 +28,7 @@ def get_commands():
     if get_commands.commands is None:
         from ibtimpl.destroy_command import DestroyCommand
         from ibtimpl.help_command import HelpCommand
+        from ibtimpl.info_command import InfoCommand
         from ibtimpl.run_command import RunCommand
         from ibtimpl.script_command import ScriptCommand
         from ibtimpl.shell_command import ShellCommand
@@ -36,6 +38,7 @@ def get_commands():
         commands = [
             DestroyCommand(),
             HelpCommand(),
+            InfoCommand(),
             RunCommand(),
             ScriptCommand(),
             ShellCommand(),
@@ -111,3 +114,14 @@ def temp_dir(dir=None):
 
 def shell_join(command):
     return " ".join(pipes.quote(s) for s in command)
+
+def show_banner():
+    print("IBT: Isolated Build Tool")
+    print("https://github.com/rcook/ibt")
+    print()
+
+def get_user_info(working_dir):
+    def _sanitize(s):
+        return re.sub("[{}]".format(re.escape("^")), "_", s)
+
+    return map(_sanitize, check_process(["stat", "-c", "%u:%G:%g:%U", working_dir]).strip().split(":"))

@@ -18,7 +18,7 @@ import sys
 from ibtimpl.context import Context
 from ibtimpl.docker_util import docker_installed
 from ibtimpl.help_command import HelpCommand
-from ibtimpl.project_info import ProjectInfo
+from ibtimpl.project import Project
 from ibtimpl.run_command import RunCommand
 from ibtimpl.util import get_commands
 
@@ -41,25 +41,32 @@ def _handle_alias(parser, alias, ctx, args):
         args = parser.parse_args(shlex.split(alias))
         args.handler(ctx, args)
 
-def _main(dir, argv):
-    if not docker_installed():
-        print("Please install Docker")
-        return
+class ThrowingArgumentParserError(Exception):
+    def __init__(self, *args, **kwargs):
+        super(ThrowingArgumentParserError, self).__init__(*args, **kwargs)
 
-    project_info = ProjectInfo.read(dir)
-    if project_info is None:
-        print("No Ibtfile project configuration file could be found")
-        return
+class ThrowingArgumentParser(argparse.ArgumentParser):
+    def __init__(self, *args, **kwargs):
+        super(ThrowingArgumentParser, self).__init__(*args, **kwargs)
 
-    ctx = Context(project_info, dir)
+    def error(self, message):
+        raise ThrowingArgumentParserError(message)
 
-    # Special-case the "status" command to report status even
-    # if .ibt directory has not been created yet
-    if not os.path.isdir(ctx.dot_dir) and argv[1 : ] == ["status"]:
-        StatusCommand().run(ctx, [])
-        return
+    def show_usage_and_exit(self):
+        self.print_usage(sys.stderr)
+        args = {'prog': self.prog, 'message': message}
+        self.exit(2, _('%(prog)s: error: %(message)s\n') % args)
 
-    parser = argparse.ArgumentParser(description="IBT: Isolated Build Tool (https://github.com/rcook/ibt)")
+    def parse_args_no_throw(self, argv):
+        try:
+            return self.parse_args(argv)
+        except ThrowingArgumentParserError:
+            return
+
+def _main(working_dir, argv):
+    ctx = Context(working_dir)
+
+    parser = ThrowingArgumentParser(description="IBT: Isolated Build Tool (https://github.com/rcook/ibt)")
     parser.add_argument("--verbose", "-v", action="store_true", help="output diagnostic information including Docker commands executed by tool")
 
     subparsers = parser.add_subparsers(
@@ -72,7 +79,33 @@ def _main(dir, argv):
         command = commands[key]
         command.add_subparser(subparsers)
 
-    aliases = ctx.settings.get("aliases", None)
+    command_argv = argv[1 : ]
+
+    # First handle commands that do not need a project
+    args = parser.parse_args_no_throw(command_argv)
+    if args is not None and not args.command.requires_project:
+        args.handler(ctx, args)
+        return
+
+    # Can't do much without Docker
+    if not docker_installed():
+        print("Please install Docker")
+        return
+
+    # All commands from this point onwards require a project.
+    # Furthermore, to get the full set of available commands, we need a project.
+    project = Project.read(working_dir)
+    if project is None:
+        print("No Ibtfile project configuration file could be found")
+        return
+
+    # Special-case the "status" command to report status even
+    # if .ibt directory has not been created yet
+    if not os.path.isdir(project.dot_dir) and argv[1 : ] == ["status"]:
+        StatusCommand().run(ctx, [])
+        return
+
+    aliases = project.settings.get("aliases", None)
     if aliases is not None:
         for key in sorted(aliases):
             alias = aliases[key]
@@ -85,8 +118,8 @@ def _main(dir, argv):
                 lambda ctx, args, alias=alias:
                     _handle_alias(parser, alias, ctx, args))
 
-    args = parser.parse_args(argv[1 : ])
-    args.handler(ctx, args)
+    args = parser.parse_args(command_argv)
+    args.handler(ctx, project, args)
 
 if __name__ == "__main__":
     colorama.init()

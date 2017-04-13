@@ -10,8 +10,12 @@
 from __future__ import print_function
 
 class Command(object):
-    def __init__(self, name):
+    def __init__(self, name, requires_project):
         self._name = name
+        self._requires_project = requires_project
 
     @property
     def name(self): return self._name
+
+    @property
+    def requires_project(self): return self._requires_project

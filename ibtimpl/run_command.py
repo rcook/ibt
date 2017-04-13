@@ -17,15 +17,15 @@ from ibtimpl.util import make_shell_script, temp_dir
 
 class RunCommand(Command):
     def __init__(self):
-        super(RunCommand, self).__init__("run")
+        super(RunCommand, self).__init__("run", requires_project=True)
 
     def add_subparser(self, subparsers):
         p = subparsers.add_parser(self.name, help="Run command inside container")
         p.add_argument("command", metavar="COMMAND", help="command")
         p.add_argument("args", metavar="ARGS", nargs=argparse.REMAINDER, help="arguments")
-        p.set_defaults(handler=self.run)
+        p.set_defaults(command=self, handler=self.run)
 
-    def run(self, ctx, args):
+    def run(self, ctx, project, args):
         if not docker_image_exists(ctx.image_id):
             raise RuntimeError("Project has not been upped")
 

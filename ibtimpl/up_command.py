@@ -17,16 +17,16 @@ from ibtimpl.util import temp_dir
 
 class UpCommand(Command):
     def __init__(self):
-        super(UpCommand, self).__init__("up")
+        super(UpCommand, self).__init__("up", requires_project=True)
 
     def add_subparser(self, subparsers):
         p = subparsers.add_parser(self.name, help="Create project image")
         p.add_argument("--destroy", "-d", action="store_true", help="destroy before recreating project image")
         p.add_argument("--docker-build", "-b", action="store_true", help="rebuild base image before creating project image")
         p.add_argument("--config", "-c", help="specify a Docker configuration")
-        p.set_defaults(handler=self.run)
+        p.set_defaults(command=self, handler=self.run)
 
-    def run(self, ctx, args):
+    def run(self, ctx, project, args):
         if args.config is None:
             parent_settings = ctx.settings
         else:

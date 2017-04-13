@@ -17,14 +17,14 @@ from ibtimpl.util import temp_dir
 
 class ScriptCommand(Command):
     def __init__(self):
-        super(ScriptCommand, self).__init__("script")
+        super(ScriptCommand, self).__init__("script", requires_project=True)
 
     def add_subparser(self, subparsers):
         p = subparsers.add_parser(self.name, help="Run script inside container")
         p.add_argument("script_path", metavar="SCRIPTPATH", help="script to run")
-        p.set_defaults(handler=self.run)
+        p.set_defaults(command=self, handler=self.run)
 
-    def run(self, ctx, args):
+    def run(self, ctx, project, args):
         if not docker_image_exists(ctx.image_id):
             raise RuntimeError("Project has not been upped")
 

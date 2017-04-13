@@ -23,15 +23,14 @@ def _get_command_help(command):
 
 class HelpCommand(Command):
     def __init__(self):
-        super(HelpCommand, self).__init__("help")
+        super(HelpCommand, self).__init__("help", requires_project=False)
 
     def add_subparser(self, subparsers):
         p = subparsers.add_parser(self.name, help="Display summary of standard commands")
-        p.set_defaults(handler=self.run)
+        p.set_defaults(command=self, handler=self.run)
 
     def run(self, ctx, args):
-        print("IBT: Isolated Build Tool")
-        print("https://github.com/rcook/ibt\n")
+        show_banner()
 
         commands = get_commands()
         aliases = ctx.settings.get("aliases", None)
