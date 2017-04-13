@@ -11,6 +11,7 @@ from __future__ import print_function
 import hashlib
 import os
 import re
+import sys
 import yaml
 
 from ibtimpl.util import check_process, get_user_info

@@ -11,7 +11,8 @@ from __future__ import print_function
 import argparse
 
 from ibtimpl.command import Command
-from ibtimpl.util import get_commands
+from ibtimpl.project import Project
+from ibtimpl.util import get_commands, show_banner
 
 # Yes, this is a hack
 # I'm too lazy to refactor the command classes for now
@@ -33,8 +34,13 @@ class HelpCommand(Command):
         show_banner()
 
         commands = get_commands()
-        aliases = ctx.settings.get("aliases", None)
-        has_aliases = aliases is not None and len(aliases) > 0
+
+        project = Project.read(ctx.working_dir)
+        if project is None:
+            has_aliases = False
+        else:
+            aliases = project.settings.get("aliases", None)
+            has_aliases = aliases is not None and len(aliases) > 0
 
         max_name_len = 0
         for name in commands:
