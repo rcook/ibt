@@ -24,7 +24,7 @@ from ibtimpl.util import check_process, get_user_info
 # current directory
 class Project(object):
     @staticmethod
-    def read(search_dir):
+    def read(search_dir, locations=[]):
         def _find_matching_config_path(locations, projects, original_dir):
             user_dir = os.path.expanduser("~")
             longest_prefix = os.path.abspath("/")
@@ -68,12 +68,7 @@ class Project(object):
             else:
                 return _read_helper(locations, original_dir, parent_dir)
 
-        locations = []
-        result = _read_helper(locations, search_dir, search_dir)
-        if not result:
-          for location in locations:
-            sys.stderr.write("> Probed for configuration at {}\n".format(location))
-        return result
+        return _read_helper(locations, search_dir, search_dir)
 
     def __init__(self, root_dir, config_path):
         self._root_dir = root_dir

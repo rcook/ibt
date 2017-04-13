@@ -52,10 +52,12 @@ class ThrowingArgumentParser(argparse.ArgumentParser):
     def error(self, message):
         raise ThrowingArgumentParserError(message)
 
-    def show_usage_and_exit(self):
-        self.print_usage(sys.stderr)
-        args = {'prog': self.prog, 'message': message}
-        self.exit(2, _('%(prog)s: error: %(message)s\n') % args)
+    def parse_args_exit_on_error(self, argv):
+        try:
+            return self.parse_args(argv)
+        except ThrowingArgumentParserError as e:
+            self.print_usage(sys.stderr)
+            self.exit(2, "{}: error: {}\n".format(self.prog, e.message))
 
     def parse_args_no_throw(self, argv):
         try:
@@ -118,7 +120,7 @@ def _main(working_dir, argv):
                 lambda ctx, args, alias=alias:
                     _handle_alias(parser, alias, ctx, args))
 
-    args = parser.parse_args(command_argv)
+    args = parser.parse_args_exit_on_error(command_argv)
     args.handler(ctx, project, args)
 
 if __name__ == "__main__":

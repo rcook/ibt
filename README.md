@@ -52,10 +52,10 @@ Alternatively, symlink to `ibt.sh` which is a wrapper around the Python script w
 
 * `destroy`: destroys the project's Docker image
 * `help`: display help
+* `info`: shows system and project information
 * `run`: runs a command inside a Docker container
 * `script`: runs a script inside a Docker container
 * `shell`: runs an interactive shell inside a Docker container
-* `status`: shows project status
 * `up`: creates Docker image for the project after optionally building base
 Docker image
 

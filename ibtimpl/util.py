@@ -32,7 +32,6 @@ def get_commands():
         from ibtimpl.run_command import RunCommand
         from ibtimpl.script_command import ScriptCommand
         from ibtimpl.shell_command import ShellCommand
-        from ibtimpl.status_command import StatusCommand
         from ibtimpl.up_command import UpCommand
 
         commands = [
@@ -42,7 +41,6 @@ def get_commands():
             RunCommand(),
             ScriptCommand(),
             ShellCommand(),
-            StatusCommand(),
             UpCommand()
         ]
         get_commands.commands = {}
