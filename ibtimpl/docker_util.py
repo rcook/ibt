@@ -35,5 +35,5 @@ def docker_image_remove(image_id):
     else:
         print("No Docker image {} to destroy".format(image_id))
 
-def docker_run(ctx, args, container_run_path):
-    check_process_in_container(ctx, args, None, ["/bin/sh", container_run_path])
+def docker_run(ctx, project, args, container_run_path):
+    check_process_in_container(ctx, project, args, None, ["/bin/sh", container_run_path])

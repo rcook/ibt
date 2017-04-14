@@ -28,7 +28,7 @@ class HelpCommand(Command):
 
     def add_subparser(self, subparsers):
         p = subparsers.add_parser(self.name, help="Display summary of standard commands")
-        p.set_defaults(command=self, handler=self.run)
+        p.set_defaults(obj=self, handler=self.run)
 
     def run(self, ctx, args):
         show_banner()

@@ -10,6 +10,7 @@
 from __future__ import print_function
 
 from ibtimpl.command import Command
+from ibtimpl.docker_util import docker_image_remove
 
 class DestroyCommand(Command):
     def __init__(self):
@@ -17,7 +18,7 @@ class DestroyCommand(Command):
 
     def add_subparser(self, subparsers):
         p = subparsers.add_parser(self.name, help="Destroy project image")
-        p.set_defaults(command=self, handler=self.run)
+        p.set_defaults(obj=self, handler=self.run)
 
-    def run(self, ctx, project, args):
-        docker_image_remove(ctx.image_id)
+    def run(self, _0, project, _1):
+        docker_image_remove(project.image_id)

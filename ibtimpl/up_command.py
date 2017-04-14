@@ -24,13 +24,13 @@ class UpCommand(Command):
         p.add_argument("--destroy", "-d", action="store_true", help="destroy before recreating project image")
         p.add_argument("--docker-build", "-b", action="store_true", help="rebuild base image before creating project image")
         p.add_argument("--config", "-c", help="specify a Docker configuration")
-        p.set_defaults(command=self, handler=self.run)
+        p.set_defaults(obj=self, handler=self.run)
 
     def run(self, ctx, project, args):
         if args.config is None:
-            parent_settings = ctx.settings
+            parent_settings = project.settings
         else:
-            configs = ctx.settings["configurations"]
+            configs = project.settings["configurations"]
             parent_settings = configs.get(args.config)
             if parent_settings is None:
                 raise RuntimeError("Configuration {} not found (available configurations: {})".format(args.config, ", ".join(configs.keys())))
@@ -69,4 +69,4 @@ class UpCommand(Command):
             with open(os.path.join(dir, ".dockerignore"), "wt") as f:
                 f.write("*\n")
 
-            docker_image_build(ctx.image_id, dir)
+            docker_image_build(project.image_id, dir)

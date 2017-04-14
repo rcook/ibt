@@ -82,7 +82,7 @@ def _main(working_dir, argv):
 
     # First handle commands that do not need a project
     args = parser.parse_args_no_throw(command_argv)
-    if args is not None and not args.command.requires_project:
+    if args is not None and not args.obj.requires_project:
         args.handler(ctx, args)
         return
 

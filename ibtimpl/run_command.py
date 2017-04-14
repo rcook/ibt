@@ -23,17 +23,17 @@ class RunCommand(Command):
         p = subparsers.add_parser(self.name, help="Run command inside container")
         p.add_argument("command", metavar="COMMAND", help="command")
         p.add_argument("args", metavar="ARGS", nargs=argparse.REMAINDER, help="arguments")
-        p.set_defaults(command=self, handler=self.run)
+        p.set_defaults(obj=self, handler=self.run)
 
     def run(self, ctx, project, args):
-        if not docker_image_exists(ctx.image_id):
+        if not docker_image_exists(project.image_id):
             raise RuntimeError("Project has not been upped")
 
-        self.run_lines(ctx, args, [" ".join([args.command] + args.args)])
+        self.run_lines(ctx, project, args, [" ".join([args.command] + args.args)])
 
-    def run_lines(self, ctx, args, lines):
-        with temp_dir(ctx.dot_dir) as dir:
+    def run_lines(self, ctx, project, args, lines):
+        with temp_dir(project.dot_dir) as dir:
             local_path = os.path.join(dir, "script")
-            container_path = os.path.join(ctx.container_dot_dir, os.path.relpath(local_path, ctx.dot_dir))
+            container_path = os.path.join(project.container_dot_dir, os.path.relpath(local_path, project.dot_dir))
             make_shell_script(local_path, lines)
-            docker_run(ctx, args, container_path)
+            docker_run(ctx, project, args, container_path)

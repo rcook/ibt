@@ -22,13 +22,13 @@ class ShellCommand(Command):
         p = subparsers.add_parser(self.name, help="Run interactive shell inside container")
         p.add_argument("command", metavar="COMMAND", nargs="?", help="command")
         p.add_argument("args", metavar="ARGS", nargs=argparse.REMAINDER, help="arguments")
-        p.set_defaults(command=self, handler=self.run)
+        p.set_defaults(obj=self, handler=self.run)
 
     def run(self, ctx, project, args):
-        if not docker_image_exists(ctx.image_id):
+        if not docker_image_exists(project.image_id):
             raise RuntimeError("Project has not been upped")
 
         user_command = args.args if args.command is None else [args.command] + args.args
-        status = call_process_in_container(ctx, args, ["-it"], user_command)
+        status = call_process_in_container(ctx, project, args, ["-it"], user_command)
         if status != 0:
             print("Shell returned {}".format(status))

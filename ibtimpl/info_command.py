@@ -85,7 +85,7 @@ class InfoCommand(Command):
 
     def add_subparser(self, subparsers):
         p = subparsers.add_parser(self.name, help="Show configuration information")
-        p.set_defaults(command=self, handler=self.run)
+        p.set_defaults(obj=self, handler=self.run)
 
     def run(self, ctx, _):
         locations = []
