@@ -54,7 +54,7 @@ class UpCommand(Command):
                     subprocess.check_call(["/bin/sh", temp_path])
 
         if args.destroy:
-            docker_image_remove(ctx.image_id)
+            docker_image_remove(project.image_id)
 
         with temp_dir() as dir:
             if docker_image is None:
