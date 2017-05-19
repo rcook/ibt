@@ -72,6 +72,8 @@ def _build_command(ctx, project, command_args, subcommand):
     command = [
         "docker",
         "run",
+        "--security-opt",
+        "seccomp:unconfined",
         "-w",
         container_working_dir,
         "-u",
