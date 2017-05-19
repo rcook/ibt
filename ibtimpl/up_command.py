@@ -9,11 +9,12 @@
 
 from __future__ import print_function
 import os
+import subprocess
 
 from ibtimpl.command import Command
 from ibtimpl.docker_util import docker_image_build, docker_image_remove
 from ibtimpl.tracing import trace_data
-from ibtimpl.util import temp_dir
+from ibtimpl.util import make_shell_script, temp_dir, temp_file
 
 class UpCommand(Command):
     def __init__(self):
@@ -50,7 +51,7 @@ class UpCommand(Command):
                 raise RuntimeError("No build commands configured for Docker base image")
             else:
                 with temp_file() as temp_path:
-                    make_shell_script(temp_path, ["cd {}".format(ctx.project_info.dir)] + docker_build)
+                    make_shell_script(temp_path, ["cd {}".format(project.root_dir)] + docker_build)
                     subprocess.check_call(["/bin/sh", temp_path])
 
         if args.destroy:
