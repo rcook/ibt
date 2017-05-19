@@ -60,7 +60,7 @@ class Project(object):
             config_path = os.path.join(search_dir, "Ibtfile")
             locations.append(config_path)
             if os.path.isfile(config_path):
-                return ProjectInfo(start_dir, config_path)
+                return Project(original_dir, config_path)
 
             parent_dir = os.path.dirname(search_dir)
             if parent_dir == search_dir:
