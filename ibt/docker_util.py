@@ -8,14 +8,15 @@
 ###############################################################################
 
 from __future__ import print_function
+import subprocess32
 
 from ibt.container_util import check_process_in_container
 from ibt.util import call_process, check_process
 
 def docker_installed():
     try:
-        return call_process(["docker", "--version"])
-    except OSError:
+        return call_process(["docker", "--version"], timeout=1)
+    except (OSError, subprocess32.TimeoutExpired):
         return False
 
 def docker_image_exists(image_id):

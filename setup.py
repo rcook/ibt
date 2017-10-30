@@ -50,7 +50,8 @@ setup(
     packages=[project_name],
     install_requires=[
         "colorama",
-        "pyyaml"
+        "pyyaml",
+        "subprocess32"
     ],
     entry_points={
         "console_scripts": [

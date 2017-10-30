@@ -12,7 +12,7 @@ import contextlib
 import os
 import re
 import shutil
-import subprocess
+import subprocess32 as subprocess
 import tempfile
 
 def _flatten(*args):
@@ -50,12 +50,12 @@ def get_commands():
     return get_commands.commands
 get_commands.commands = None
 
-def call_process(command):
+def call_process(command, timeout=None):
     proc = subprocess.Popen(
         command,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE)
-    proc.communicate()
+    proc.communicate(timeout=timeout)
     return proc.returncode == 0
 
 def check_process(command):

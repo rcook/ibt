@@ -93,7 +93,7 @@ def _main(argv=None):
 
     # Can't do much without Docker
     if not docker_installed():
-        print("Please install Docker")
+        print("Please install and/or enable Docker")
         return
 
     # All commands from this point onwards require a project.
