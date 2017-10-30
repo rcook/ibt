@@ -1,11 +1,6 @@
+/.eggs/
+/build/
+/dist/
+/env/
+/ibt.egg-info/
 *.pyc
-/.Python
-/.env
-/Scripts/
-/bin/
-/docroot/
-/include/
-/lib/
-/tcl/
-/lib64
-/pip-selfcheck.json
