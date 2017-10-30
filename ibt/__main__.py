@@ -15,6 +15,7 @@ import colorama
 import os
 import sys
 
+from ibt import __project_name__, __version__
 from ibt.context import Context
 from ibt.docker_util import docker_installed
 from ibt.help_command import HelpCommand
@@ -72,6 +73,7 @@ def _main(argv=None):
 
     parser = ThrowingArgumentParser(description="IBT: Isolated Build Tool (https://github.com/rcook/ibt)")
     parser.add_argument("--verbose", "-v", action="store_true", help="output diagnostic information including Docker commands executed by tool")
+    parser.add_argument("--version", action="version", version="{} version {}".format(__project_name__, __version__))
 
     subparsers = parser.add_subparsers(
         title="Subcommands and aliases",
