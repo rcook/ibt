@@ -43,7 +43,7 @@ setup(
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 2.7",
     ],
-    url="ibt | git_url(git_server) }}",
+    url="https://github.com/rcook/ibt",
     author="Richard Cook",
     author_email="rcook@rcook.org",
     license="MIT",
