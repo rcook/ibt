@@ -10,9 +10,9 @@
 from __future__ import print_function
 import argparse
 
-from ibtimpl.command import Command
-from ibtimpl.container_util import call_process_in_container
-from ibtimpl.docker_util import docker_image_exists
+from ibt.command import Command
+from ibt.container_util import call_process_in_container
+from ibt.docker_util import docker_image_exists
 
 class ShellCommand(Command):
     def __init__(self):

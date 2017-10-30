@@ -10,10 +10,10 @@
 from __future__ import print_function
 import os
 
-from ibtimpl.command import Command
-from ibtimpl.docker_util import docker_image_exists, docker_installed
-from ibtimpl.project import Project
-from ibtimpl.util import show_banner
+from ibt.command import Command
+from ibt.docker_util import docker_image_exists, docker_installed
+from ibt.project import Project
+from ibt.util import show_banner
 
 def _show_system_info(ctx):
     uid, group_name, gid, user_name = ctx.user_info()

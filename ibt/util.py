@@ -26,13 +26,13 @@ def _flatten(*args):
 
 def get_commands():
     if get_commands.commands is None:
-        from ibtimpl.destroy_command import DestroyCommand
-        from ibtimpl.help_command import HelpCommand
-        from ibtimpl.info_command import InfoCommand
-        from ibtimpl.run_command import RunCommand
-        from ibtimpl.script_command import ScriptCommand
-        from ibtimpl.shell_command import ShellCommand
-        from ibtimpl.up_command import UpCommand
+        from ibt.destroy_command import DestroyCommand
+        from ibt.help_command import HelpCommand
+        from ibt.info_command import InfoCommand
+        from ibt.run_command import RunCommand
+        from ibt.script_command import ScriptCommand
+        from ibt.shell_command import ShellCommand
+        from ibt.up_command import UpCommand
 
         commands = [
             DestroyCommand(),

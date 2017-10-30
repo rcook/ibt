@@ -11,9 +11,9 @@ from __future__ import print_function
 import argparse
 import os
 
-from ibtimpl.command import Command
-from ibtimpl.docker_util import docker_image_exists, docker_run
-from ibtimpl.util import make_shell_script, temp_dir
+from ibt.command import Command
+from ibt.docker_util import docker_image_exists, docker_run
+from ibt.util import make_shell_script, temp_dir
 
 class RunCommand(Command):
     def __init__(self):

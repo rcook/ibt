@@ -9,7 +9,7 @@
 
 from __future__ import print_function
 
-from ibtimpl.util import get_user_info
+from ibt.util import get_user_info
 
 class Context(object):
     def __init__(self, working_dir):

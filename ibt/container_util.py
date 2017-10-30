@@ -12,8 +12,8 @@ import os
 import re
 import subprocess
 
-from ibtimpl.tracing import trace_command
-from ibtimpl.util import ensure_mount_sources
+from ibt.tracing import trace_command
+from ibt.util import ensure_mount_sources
 
 def _expand(env_vars, value):
     def _replace(m):

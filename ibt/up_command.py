@@ -11,10 +11,10 @@ from __future__ import print_function
 import os
 import subprocess
 
-from ibtimpl.command import Command
-from ibtimpl.docker_util import docker_image_build, docker_image_remove
-from ibtimpl.tracing import trace_data
-from ibtimpl.util import make_shell_script, temp_dir, temp_file
+from ibt.command import Command
+from ibt.docker_util import docker_image_build, docker_image_remove
+from ibt.tracing import trace_data
+from ibt.util import make_shell_script, temp_dir, temp_file
 
 class UpCommand(Command):
     def __init__(self):

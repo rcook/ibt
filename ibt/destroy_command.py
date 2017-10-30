@@ -9,8 +9,8 @@
 
 from __future__ import print_function
 
-from ibtimpl.command import Command
-from ibtimpl.docker_util import docker_image_remove
+from ibt.command import Command
+from ibt.docker_util import docker_image_remove
 
 class DestroyCommand(Command):
     def __init__(self):

@@ -15,12 +15,12 @@ import colorama
 import os
 import sys
 
-from ibtimpl.context import Context
-from ibtimpl.docker_util import docker_installed
-from ibtimpl.help_command import HelpCommand
-from ibtimpl.project import Project
-from ibtimpl.run_command import RunCommand
-from ibtimpl.util import get_commands
+from ibt.context import Context
+from ibt.docker_util import docker_installed
+from ibt.help_command import HelpCommand
+from ibt.project import Project
+from ibt.run_command import RunCommand
+from ibt.util import get_commands
 
 _HELP_COMMAND = HelpCommand()
 _RUN_COMMAND = RunCommand()

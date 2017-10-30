@@ -14,7 +14,7 @@ import re
 import sys
 import yaml
 
-from ibtimpl.util import check_process, get_user_info
+from ibt.util import check_process, get_user_info
 
 # Detects current project directory and configuration path based on following
 # strategy:
