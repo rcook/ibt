@@ -33,20 +33,28 @@ resemble Vagrant workflows where `up`, `destroy`, `run` correspond closely to
 
 ## Installation
 
-Ensure you have a working [Python 2.7][python] installation on the host machine as well as [Docker][docker]. Simply clone this repository and symlink the `ibt.py` script into a directory on your search path. These instructions assume that the `bin` directory within your home directory is on the search path:
+Ensure you have a working [Python 2.7][python] installation:
 
-```bash
-$ git clone https://github.com/rcook/ibt.git
-$ ln -sf $PWD/ibt/ibt $HOME/bin/ibt
+```
+pip install --user ibt
 ```
 
-You will need to install this package's dependencies using [pip][pip]:
+You can also clone from this repository and perform a dev install:
 
-```bash
-$ pip install -r requirements.txt
+```
+git clone https://github.com/rcook/ibt.git
+cd ibt
+pip install --user -e .
 ```
 
-Alternatively, symlink to `ibt.sh` which is a wrapper around the Python script which uses [virtualenv][virtualenv].
+Or run it within a virtual environment:
+
+```
+git clone https://github.com/rcook/ibt.git
+cd ibt
+script/virtualenv
+script/ibt
+```
 
 ## Standard commands
 
@@ -88,7 +96,7 @@ All build commands will run inside a fully isolated Debian-based Docker
 container as specified by the project configuration in `Ibtfile`. First, create
 the base Docker images:
 
-```bash
+```
 $ cd docker-images/debian-gcc
 $ make build
 $ cd ../debian-gcc-python
@@ -112,7 +120,7 @@ can be run to configure/make/run the project code:
 
 See contents of `example` subdirectory.
 
-```bash
+```
 $ cd example/
 $ ibt up
 Building Docker image ibt-789dbc504a0690d786ddd43474dfbcc5
