@@ -62,7 +62,12 @@ def _handle_alias(parser, alias, ctx, args):
         args = parser.parse_args(shlex.split(alias))
         args.handler(ctx, args)
 
-def _main(working_dir, argv):
+def _main(argv=None):
+    if argv is None:
+        argv = sys.argv[1:]
+
+    colorama.init()
+    working_dir = os.getcwd()
     ctx = Context(working_dir)
 
     parser = ThrowingArgumentParser(description="IBT: Isolated Build Tool (https://github.com/rcook/ibt)")
@@ -78,7 +83,7 @@ def _main(working_dir, argv):
         command = commands[key]
         command.add_subparser(subparsers)
 
-    command_argv = argv[1 : ]
+    command_argv = argv
 
     # First handle commands that do not need a project
     args = parser.parse_args_no_throw(command_argv)
@@ -100,7 +105,7 @@ def _main(working_dir, argv):
 
     # Special-case the "status" command to report status even
     # if .ibt directory has not been created yet
-    if not os.path.isdir(project.dot_dir) and argv[1 : ] == ["status"]:
+    if not os.path.isdir(project.dot_dir) and argv == ["status"]:
         StatusCommand().run(ctx, [])
         return
 
@@ -121,5 +126,4 @@ def _main(working_dir, argv):
     args.handler(ctx, project, args)
 
 if __name__ == "__main__":
-    colorama.init()
-    _main(os.getcwd(), sys.argv)
+    _main()
