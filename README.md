@@ -1,6 +1,7 @@
 # IBT: Isolated Build Tool
 
 [![View on PyPI](https://img.shields.io/pypi/v/ibt.svg)](https://pypi.python.org/pypi/ibt)
+[![Licence](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/rcook/ibt/master/LICENSE)
 
 Project- and build-oriented tool for working with [Docker][docker] images and
 containers
