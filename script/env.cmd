@@ -6,6 +6,11 @@ goto :CMDSCRIPT
 set -euo pipefail
 IFS=$'\n\t'
 
+if [ "$#" -lt 1 ]; then
+    echo "Please pass at least one argument"
+    exit 1
+fi
+
 script_name=$1
 shift
 args=$*
