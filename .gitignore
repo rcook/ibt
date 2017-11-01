@@ -1,6 +1,5 @@
 /.eggs/
 /build/
 /dist/
-/env/
 /ibt.egg-info/
 *.pyc

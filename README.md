@@ -40,7 +40,6 @@ Ensure you have a working [Python 2.7][python] installation:
 
 ```
 pip install --user ibt
-env
 ```
 
 You can also clone from this repository and perform a dev install:
@@ -49,17 +48,6 @@ You can also clone from this repository and perform a dev install:
 git clone https://github.com/rcook/ibt.git
 cd ibt
 pip install --user -e .
-env
-```
-
-Or run it within a virtual environment:
-
-```
-git clone https://github.com/rcook/ibt.git
-cd ibt
-script/virtualenv
-script/env pip install -e .
-script/env ibt
 ```
 
 ## Standard commands
