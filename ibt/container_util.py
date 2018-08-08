@@ -19,6 +19,7 @@ def _expand(env_vars, value):
     def _replace(m):
         key = m.group(1)
         replacement = env_vars.get(key)
+        if replacement is None: replacement = os.getenv(key, None)
         return m.group(0) if replacement is None else replacement
 
     return re.sub('\$([A-Za-z_][A-Za-z_0-9]*)', _replace, value)
@@ -67,7 +68,7 @@ def _build_command(ctx, project, command_args, subcommand):
     env_vars_setting = project.settings.get("env_vars", None)
     if env_vars_setting is not None:
         for key in env_vars_setting:
-            env_vars[key] = env_vars_setting[key]
+            env_vars[key] = _expand(env_vars, env_vars_setting[key])
 
     command = [
         "docker",
