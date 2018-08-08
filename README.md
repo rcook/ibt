@@ -50,6 +50,12 @@ cd ibt
 pip install --user -e .
 ```
 
+Note that Pip installs scripts to `$HOME/.local/bin` by default (varies based on platform), so make sure that this path is available on the system search path (via the `PATH` environment variable). You can do this by appending this in your `.bashrc` or other shell configuration script:
+
+```
+echo 'export PATH=$HOME/.local/bin:$PATH' >> ~/.bashrc
+```
+
 ## Standard commands
 
 * `destroy`: destroys the project's Docker image
