@@ -216,6 +216,15 @@ $ ibt destroy
 Destroying Docker image ibt-789dbc504a0690d786ddd43474dfbcc5
 ```
 
+## Building and publishing
+
+```
+pip install --user twine
+pip install --user setuptools-markdown
+pip install --user -r requirements.txt
+python setup.py sdist
+twine upload dist/*
+
 ## Licence
 
 Released under MIT License
