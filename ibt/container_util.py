@@ -47,16 +47,6 @@ def _build_command(ctx, project, command_args, subcommand):
         project.root_dir: container_project_dir,
         project.dot_dir: project.container_dot_dir
     }
-
-    volumes_setting = project.settings.get("volumes", None)
-    if volumes_setting is not None:
-        for key in volumes_setting:
-            local_dir = project.resolve_local_path(key)
-            container_dir = volumes_setting[key]
-            if local_dir in volumes:
-                raise RuntimeError("Duplicate volume {}".format(local_dir))
-            volumes[local_dir] = container_dir
-
     _, _, _, user_name = ctx.user_info()
 
     env_vars = {
@@ -69,6 +59,16 @@ def _build_command(ctx, project, command_args, subcommand):
     if env_vars_setting is not None:
         for key in env_vars_setting:
             env_vars[key] = _expand(env_vars, env_vars_setting[key])
+
+    volumes_setting = project.settings.get("volumes", None)
+    if volumes_setting is not None:
+        for key in volumes_setting:
+            local_dir = _expand(env_vars, key)
+            local_dir = project.resolve_local_path(local_dir)
+            container_dir = volumes_setting[key]
+            if local_dir in volumes:
+                raise RuntimeError("Duplicate volume {}".format(local_dir))
+            volumes[local_dir] = container_dir
 
     command = [
         "docker",
