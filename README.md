@@ -88,6 +88,38 @@ configure port forwarding
 * `volumes`: (optional) one or more additional volumes to mount inside
 container
 
+### Environment variable settings
+
+The environment section contain multiple environment variables to be set in the container. 
+The key represents the environment variable to be created. The value contains either the value or a reference to
+a substitution. A Substitution value starts with a `$` and is resolved against the environment variable map. If the variable 
+is not found, the environment variable is looked up on the host.   
+    
+```yaml
+env_vars:
+    ARTIFACTORY_APIKEY: $ARTIFACTORY_APIKEY
+    ARTIFACTORY_USER: BOB_THE_BUILDER
+    COMPOSITE_KEY: $ARTIFACTORY_USER@$HOST
+```
+
+### Volumes settings
+
+The volume section contains multiple keys and values. 
+The key refers to a path on the host and the value contains the path in the container. 
+
+```yaml
+volumes:  
+   host-path: container-path
+```
+
+Key and values support variable expansion like the environment variables.
+
+```yaml
+volumes:  
+   $HOME/.kube: /home/$USER/.kube
+   $HOME/.aws: /home/$USER/.aws
+```
+
 ## Sample project
 
 ### Create Docker images
