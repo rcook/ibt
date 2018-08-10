@@ -10,6 +10,7 @@
 from __future__ import print_function
 import os
 import subprocess
+import pipes
 
 from ibt.command import Command
 from ibt.docker_util import docker_image_build, docker_image_remove
@@ -64,8 +65,8 @@ class UpCommand(Command):
                 uid, group_name, gid, user_name = ctx.user_info()
                 with open(os.path.join(dir, "Dockerfile"), "wt") as f:
                     f.write("FROM {}\n".format(docker_image))
-                    f.write("RUN groupadd -g {} {}\n".format(gid, group_name))
-                    f.write("RUN useradd -l -u {} -g {} {}\n".format(uid, gid, user_name))
+                    f.write("RUN groupadd -g {} {}\n".format(gid, pipes.quote(group_name)))
+                    f.write("RUN useradd -l -u {} -g {} {}\n".format(uid, gid, pipes.quote(user_name)))
 
             with open(os.path.join(dir, ".dockerignore"), "wt") as f:
                 f.write("*\n")
