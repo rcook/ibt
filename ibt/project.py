@@ -107,6 +107,8 @@ class Project(object):
         if self._settings is None:
             with open(self._config_path, "rt") as f:
                 self._settings = yaml.load(f)
+                if self._settings is None:
+                    raise RuntimeError("Invalid configuration file {}".format(self._config_path))
         return self._settings
 
     def resolve_local_path(self, path):
