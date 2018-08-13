@@ -57,12 +57,12 @@ def _format_alias_description(alias):
     else:
         return "  Command:\n  $ {}".format(alias)
 
-def _handle_alias(parser, alias, ctx, args):
+def _handle_alias(parser, project, ctx, args, alias):
     if isinstance(alias, list):
-        _RUN_COMMAND.run_lines(ctx, args, alias)
+        _RUN_COMMAND.run_lines(ctx, project, args, alias)
     else:
         args = parser.parse_args(shlex.split(alias))
-        args.handler(ctx, args)
+        args.handler(ctx, project, args)
 
 def _main(argv=None):
     if argv is None:
@@ -123,7 +123,7 @@ def _main(argv=None):
                 formatter_class=argparse.RawDescriptionHelpFormatter)
             p.set_defaults(handler=
                 lambda ctx, project, args, alias=alias:
-                    _handle_alias(parser, alias, ctx, args))
+                    _handle_alias(parser, project, ctx, args, alias))
 
     args = parser.parse_args_exit_on_error(command_argv)
     args.handler(ctx, project, args)
