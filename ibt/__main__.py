@@ -13,6 +13,7 @@ from __future__ import print_function
 import argparse
 import colorama
 import os
+import shlex
 import sys
 
 from ibt import __project_name__, __version__
@@ -121,7 +122,7 @@ def _main(argv=None):
                 description=_format_alias_description(alias),
                 formatter_class=argparse.RawDescriptionHelpFormatter)
             p.set_defaults(handler=
-                lambda ctx, args, alias=alias:
+                lambda ctx, project, args, alias=alias:
                     _handle_alias(parser, alias, ctx, args))
 
     args = parser.parse_args_exit_on_error(command_argv)
