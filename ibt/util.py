@@ -9,7 +9,9 @@
 
 from __future__ import print_function
 import contextlib
+import grp
 import os
+import pwd
 import re
 import shutil
 import subprocess32 as subprocess
@@ -65,7 +67,7 @@ def check_process(command):
         stderr=subprocess.PIPE)
     (out, error) = proc.communicate()
     if proc.returncode != 0:
-        raise RuntimeError("Popen command failed: {}".format(error))
+        raise RuntimeError("Popen command failed: {} (command: {})".format(error, command))
     return out
 
 def make_shell_script(path, lines):
@@ -122,4 +124,11 @@ def get_user_info(working_dir):
     def _sanitize(s):
         return re.sub("[{}]".format(re.escape("^")), "_", s)
 
-    return map(_sanitize, check_process(["stat", "-c", "%u:%G:%g:%U", working_dir]).strip().split(":"))
+    fs = os.stat(working_dir)
+    uid = fs.st_uid
+    uname = pwd.getpwuid(uid)[0]
+    gid = fs.st_gid
+    gname = grp.getgrgid(gid)[0]
+
+    # Note the weird order we return the information in...
+    return [str(uid), _sanitize(gname), str(gid), _sanitize(uname)]
