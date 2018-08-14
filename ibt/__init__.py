@@ -8,5 +8,5 @@
 ###############################################################################
 
 __project_name__ = "ibt"
-__version__ = "0.5"
+__version__ = "0.6"
 __description__ = "Simple wrappers around Docker etc. for fully isolated build environments"
