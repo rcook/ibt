@@ -59,6 +59,6 @@ setup(
         ]
     },
     include_package_data=True,
-    data_files=[("", ["README.md"])],
+    data_files=[("", ["README", "README.md"])],
     test_suite="{}.tests.suite".format(project_name),
     zip_safe=False)
