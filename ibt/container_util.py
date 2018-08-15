@@ -9,6 +9,7 @@
 
 from __future__ import print_function
 import os
+import pipes
 import re
 import subprocess
 
@@ -24,7 +25,7 @@ def _expand(env_vars, value):
 
     return re.sub('\$([A-Za-z_][A-Za-z_0-9]*)', _replace, value)
 
-def _build_command(ctx, project, command_args, subcommand):
+def _build_command(ctx, project, command_args, subcommand, alias_args):
     container_project_dir = project.settings.get("container-project-dir", project.default_container_project_dir)
 
     rel_dir = os.path.relpath(ctx.working_dir, project.root_dir)
@@ -50,6 +51,7 @@ def _build_command(ctx, project, command_args, subcommand):
     _, _, _, user_name = ctx.user_info()
 
     env_vars = {
+        "IBTALIASARGS": _build_arg_string(alias_args),
         "IBTPROJECTDIR": container_project_dir,
         "IBTUSER": user_name,
         "USER": user_name
@@ -91,14 +93,17 @@ def _build_command(ctx, project, command_args, subcommand):
 
     return command, volumes
 
-def check_process_in_container(ctx, project, args, command_args=None, subcommand=None):
-    command, volumes = _build_command(ctx, project, command_args, subcommand)
+def _build_arg_string(args):
+    return "" if args is None else " ".join(pipes.quote(x) for x in args)
+
+def check_process_in_container(ctx, project, args, command_args=None, subcommand=None, alias_args=None):
+    command, volumes = _build_command(ctx, project, command_args, subcommand, alias_args)
     trace_command(args, command)
     with ensure_mount_sources(volumes.keys()):
         subprocess.check_call(command)
 
-def call_process_in_container(ctx, project, args, command_args=None, subcommand=None):
-    command, volumes = _build_command(ctx, project, command_args, subcommand)
+def call_process_in_container(ctx, project, args, command_args=None, subcommand=None, alias_args=None):
+    command, volumes = _build_command(ctx, project, command_args, subcommand, alias_args)
     trace_command(args, command)
     with ensure_mount_sources(volumes.keys()):
         return subprocess.call(command)

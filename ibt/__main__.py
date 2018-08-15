@@ -61,8 +61,9 @@ def _handle_alias(parser, project, ctx, args, alias):
     if isinstance(alias, list):
         _RUN_COMMAND.run_lines(ctx, project, args, alias)
     else:
-        args = parser.parse_args(shlex.split(alias))
-        args.handler(ctx, project, args)
+        run_args = parser.parse_args(shlex.split(alias))
+        run_args.alias_args = args.args
+        run_args.handler(ctx, project, run_args)
 
 def _main(argv=None):
     if argv is None:
@@ -121,6 +122,7 @@ def _main(argv=None):
                 help="<alias>",
                 description=_format_alias_description(alias),
                 formatter_class=argparse.RawDescriptionHelpFormatter)
+            p.add_argument("args", metavar="ARGS", nargs=argparse.REMAINDER, help="arguments")
             p.set_defaults(handler=
                 lambda ctx, project, args, alias=alias:
                     _handle_alias(parser, project, ctx, args, alias))

@@ -64,8 +64,13 @@ echo 'export PATH=$HOME/.local/bin:$PATH' >> ~/.bashrc
 * `run`: runs a command inside a Docker container
 * `script`: runs a script inside a Docker container
 * `shell`: runs an interactive shell inside a Docker container
-* `up`: creates Docker image for the project after optionally building base
-Docker image
+* `up`: creates Docker image for the project after optionally building base Docker image
+
+All commands have available to them the following environment variables:
+
+* `IBTALIASARGS`: additional arguments passed on the command line to aliases
+* `IBTPROJECTDIR`: the current project directory in the container
+* `IBTUSER` and `USER`: the user name
 
 ## `Ibtfile` settings
 
