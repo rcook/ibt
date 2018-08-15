@@ -38,13 +38,13 @@ resemble Vagrant workflows where `up`, `destroy`, `run` correspond closely to
 
 Ensure you have a working [Python 2.7][python] installation:
 
-```
+```bash
 pip install --user ibt
 ```
 
 You can also clone from this repository and perform a dev install:
 
-```
+```bash
 git clone https://github.com/rcook/ibt.git
 cd ibt
 pip install --user -e .
@@ -52,7 +52,7 @@ pip install --user -e .
 
 Note that Pip installs scripts to `$HOME/.local/bin` by default (varies based on platform), so make sure that this path is available on the system search path (via the `PATH` environment variable). You can do this by appending this in your `.bashrc` or other shell configuration script:
 
-```
+```bash
 echo 'export PATH=$HOME/.local/bin:$PATH' >> ~/.bashrc
 ```
 
@@ -153,7 +153,7 @@ can be run to configure/make/run the project code:
 
 See contents of `example` subdirectory.
 
-```
+```bash
 $ cd example/
 $ ibt up
 Building Docker image ibt-789dbc504a0690d786ddd43474dfbcc5
