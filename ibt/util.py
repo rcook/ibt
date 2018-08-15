@@ -121,8 +121,9 @@ def show_banner():
     print()
 
 def get_user_info(working_dir):
+    # Generate a (hopefully) valid user/group name
     def _sanitize(s):
-        return re.sub("[{}]".format(re.escape("^")), "_", s)
+        return re.sub("[^A-Za-z0-9_-]", "_", s)
 
     fs = os.stat(working_dir)
     uid = fs.st_uid
