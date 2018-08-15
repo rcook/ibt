@@ -216,15 +216,9 @@ $ ibt destroy
 Destroying Docker image ibt-789dbc504a0690d786ddd43474dfbcc5
 ```
 
-## Building and publishing
+## Developer guide
 
-```
-pip install --user twine
-pip install --user setuptools-markdown
-pip install --user -r requirements.txt
-python setup.py sdist
-twine upload dist/*
-```
+[See developer guide][developer-guide]
 
 ## Licence
 
@@ -232,6 +226,7 @@ Released under MIT License
 
 Copyright &copy; 2016, Richard Cook. All rights reserved.
 
+[developer-guide]: DEV.md
 [docker]: https://www.docker.com/
 [pip]: https://pip.pypa.io/en/stable/installing/
 [python]: https://www.python.org/downloads/
