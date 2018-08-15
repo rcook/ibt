@@ -124,19 +124,20 @@ volumes:
 
 ### Create Docker images
 
-All build commands will run inside a fully isolated Debian-based Docker
-container as specified by the project configuration in `Ibtfile`. First, create
-the base Docker images:
+All build commands will run inside a fully isolated Debian-based Docker container as specified by the project configuration in `Ibtfile`. First, create the base Docker images:
 
-```
-$ cd docker-images/debian-gcc
-$ make build
-$ cd ../debian-gcc-python
-$ make build
+```bash
+cd docker
+pushd debian-gcc
+make build
+popd
+pushd debian-gcc-python
+make build
+popd
+docker images
 ```
 
-This creates `debian-gcc` which contains basic build tools, CMake and gdb and
-`debian-gcc-python` which extends this with the addition of Python 2.7.
+This creates `debian-gcc` which contains basic build tools, CMake and gdb and `debian-gcc-python` which extends this with the addition of Python 2.7. The last command will list locally available Docker images which will now include `ibt/debian-gcc` and `ibt/debian-gcc-python`.
 
 ### Aliases
 
