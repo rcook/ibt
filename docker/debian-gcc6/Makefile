@@ -2,4 +2,4 @@
 
 .PHONY: build
 build:
-	docker build -t ibt/debian-gcc5 .
+	docker build -t ibt/debian-gcc6 .

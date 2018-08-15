@@ -134,10 +134,13 @@ popd
 pushd debian-gcc-python
 make build
 popd
+pushd debian-gcc6
+make build
+popd
 docker images
 ```
 
-This creates `debian-gcc` which contains basic build tools, CMake and gdb and `debian-gcc-python` which extends this with the addition of Python 2.7. The last command will list locally available Docker images which will now include `ibt/debian-gcc` and `ibt/debian-gcc-python`.
+This creates `debian-gcc` which contains basic build tools, CMake and gdb and `debian-gcc-python` which extends this with the addition of Python 2.7. `debian-gcc6` includes the GCC 6 toolchain. The last command will list locally available Docker images which will now include `ibt/debian-gcc` and `ibt/debian-gcc-python` etc.
 
 ### Aliases
 

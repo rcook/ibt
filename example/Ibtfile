@@ -1,9 +1,9 @@
 # Get IBT: https://github.com/rcook/ibt
 
 docker:
-  image: ibt/debian-gcc5
+  image: ibt/debian-gcc6
   build:
-  - cd ../docker/debian-gcc5
+  - cd ../docker/debian-gcc6
   - make build
 
 ports:
