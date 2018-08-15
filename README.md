@@ -161,8 +161,8 @@ $ cd example/
 $ ibt up
 Building Docker image ibt-789dbc504a0690d786ddd43474dfbcc5
 $ ibt cmake
--- The C compiler identification is GNU 5.4.0
--- The CXX compiler identification is GNU 5.4.0
+-- The C compiler identification is GNU 6.3.0
+-- The CXX compiler identification is GNU 6.3.0
 -- Check for working C compiler: /usr/bin/cc
 -- Check for working C compiler: /usr/bin/cc -- works
 -- Detecting C compiler ABI info
@@ -190,22 +190,34 @@ argv[0] = ./hello-world
 argv[1] = first
 argv[2] = second
 argv[3] = third
-$ ibt status
+$ ibt info
 IBT: Isolated Build Tool
+https://github.com/rcook/ibt
+
+System information:
+  Docker:              installed
+
+Context information:
+  Working directory:   /home/user/src/ibt/example
+  User:                user (1002)
+  Group:               group (1003)
 
 Project information:
   Project directory:   /home/user/src/ibt/example
-  Working directory:   /home/user/src/ibt/example
   Project ID:          789dbc504a0690d786ddd43474dfbcc5
   Configuration file:  /home/user/src/ibt/example/Ibtfile
   Temporary directory: /home/user/src/ibt/example/.ibt
-User information:
+
+Project user information:
   User:                user (1002)
-  Group:               user (1002)
+  Group:               group (1003)
+
 Docker container information:
   Docker image ID:     ibt-789dbc504a0690d786ddd43474dfbcc5
   Project directory:   /example
   Temporary directory: /example/.ibt
+  Docker base image:   ibt/debian-gcc6
+
 IBT status:
   Temporary directory: exists
   Docker image:        built
@@ -214,8 +226,9 @@ Project aliases:
   cmake = run 'cd $IBTPROJECTDIR && mkdir -p build && cd build && cmake -DCMAKE_BUILD_TYPE=Debug ..'
   debug = shell /bin/sh -c 'cd $IBTPROJECTDIR/build && gdb ./hello-world'
   exec = run 'cd $IBTPROJECTDIR/build && ./hello-world'
-  make = run 'cd $IBTPROJECTDIR/build && make'
-
+  make:
+  - cd $IBTPROJECTDIR/build
+  - make
 $ ibt destroy
 Destroying Docker image ibt-789dbc504a0690d786ddd43474dfbcc5
 ```
